@@ -15,7 +15,7 @@ body{
 }
 
 #logo{
-    width: 500px;
+    width: 30%;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -23,6 +23,7 @@ body{
     font-size: 28px;
     font-weight: bold;
     color:lightsteelblue;
+    margin-left: 1rem;
 }
 #logo h1{
     font-size: 28px;
@@ -30,10 +31,16 @@ body{
     text-decoration: overline;
     border-bottom: 2px solid lightsteelblue;
 }
+#logo-sub{
+    font-size: 14px; 
+    color: white; 
+    letter-spacing: .3em; 
+    font-weight: normal
+}
 .buttonContainer{
     display: flex;
     padding: 10px;
-    width: 400px;
+    width: 40%;
     margin: 0 auto;
 }
 
@@ -94,4 +101,112 @@ textarea {
 }
 .hidden{
     display: none;
+}
+
+/* media queries for smaller screens */
+@media screen and (max-width: 1300px){
+    #logo h1{
+        font-size: 24px;
+    }
+    #logo-sub{
+        letter-spacing: .2em;
+    }
+
+}
+@media screen and (max-width: 1150px){
+    #logo{
+        margin-left: 20px;
+    }
+    #logo h1{
+        font-size: 22px;
+    }
+    #logo-sub{
+        font-size: 12px;
+        letter-spacing: .15em;
+    }
+
+}
+@media screen and (max-width: 980px){
+    #logo{
+        margin-left: 12px;
+    }
+    #logo h1{
+        font-size: 24px;
+    }
+    #logo-sub{
+        display: none;
+    }
+
+    .buttonContainer{
+        padding: 8px;
+        width: 50%;
+        margin-right: 10px;
+    }
+    
+    .toggleButton{
+        padding:  8px;
+        padding-top: 10px;
+    }
+}
+@media screen and (max-width: 750px){
+    .contentWrapper{
+        flex-direction: column;
+    }
+    #logo{
+        width: 300px;
+    }
+    #logo h1{
+        font-size: 22px;
+    }
+    #logo-sub{
+        font-size: 10px;
+    }
+    .toggleButton{
+        padding:  5px;
+        padding-top: 13px;
+        font-size: 14px;
+    }
+    .header{
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 460px){
+    .header{
+        flex-direction: column;
+        align-items: center;
+        width: 100vw;
+    }
+    #logo{
+        display: inline;
+        width: 100vw;
+        margin: 0 auto;
+        padding: 10px;
+    }  
+    #logo h1{
+        position: relative;
+        left: 38%;
+    } 
+    .buttonContainer{
+        margin: 10px;
+        padding: 0;
+    }
+}
+@media screen and (max-width: 350px){
+    .header{
+        margin: 0;
+        padding: 0;
+        justify-content: center;
+        align-items: center;
+    } 
+    #logo{        
+        justify-content: center;
+        align-items: center;
+    }  
+    .buttonContainer{
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        margin: 10px;
+    }
 }

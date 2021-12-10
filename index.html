@@ -19,7 +19,7 @@
     <div class="header">
         <div id="logo">
             <h1>CodeBox</h1>
-            <span style="font-size: 14px; color: white; letter-spacing: .3em; font-weight: normal"> &lt;&gt;Coding-SandBox&lt;/&gt;</span>
+            <span id="logo-sub"> &lt;&gt;Coding-SandBox&lt;/&gt;</span>
         </div>
         <div class="buttonContainer">    
             <div class="toggleButton selected" id="htmlBtn">HTML</div>
@@ -32,51 +32,11 @@
     <div class="contentWrapper">
         <div class="html"><textarea id="html-text-area" class="text-area">&lt;p&gt;Hello World!&lt;/p&gt;</textarea></div>
         <div class="css hidden"><textarea id="css-text-area" class="text-area">*, body, html { margin: 0; padding: 0}</textarea></div>
-        <div class="javascript hidden"><textarea id="javascript-text-area" class="text-area">alert("Let's start coding!")</textarea></div>
+        <div class="javascript hidden"><textarea id="javascript-text-area" class="text-area">alert("Let's start coding! Begin by clearing the JavaScript panel to remove me.")</textarea></div>
         <iframe class="output" id="output-text"></iframe>
     </div>
 
-    <script>
-        $(function () {
-        
-            $('.toggleButton').on('click', function(){
-                $(this).toggleClass('selected');
-            })
-
-            $('#htmlBtn').on('click', function(){
-                $('.html').toggleClass('hidden')
-            })
-            $('#cssBtn').on('click', function(){
-                $('.css').toggleClass('hidden')
-            })
-            $('#javascriptBtn').on('click', function(){
-                $('.javascript').toggleClass('hidden')
-            })
-            $('#outputBtn').on('click', function(){
-                $('.output').toggleClass('hidden')
-            })
-
-            //set the content of the iframe
-            $("#html-text-area").on('change keyup paste', function(){
-                updateContent()                
-            })
-
-            $("#css-text-area").on('change keyup paste', function(){
-                updateContent()                
-            })
-
-            $("#javascript-text-area").on('change keyup paste', function(){
-                updateContent()                
-            })
-
-            function updateContent(){
-            $('iframe').contents().find("html").html('<style type="text/css" >' + $('#css-text-area').val() + '</style>' + $('#html-text-area').val());
-            document.getElementById("output-text").contentWindow.eval($("#javascript-text-area").val())
-            }
-
-
-        })
-      </script>
+      <script src="./script.js"></script>
     </body>
 </html>
 
