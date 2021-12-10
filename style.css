@@ -43,8 +43,9 @@ body{
 
             #logo-me{
                 padding: 1rem;
-                font-size: 12px;
-                margin-top: 10px;
+                font-size: .75rem;
+                margin-top: .5rem;
+                color: lightsteelblue;
             }
 
 /* container for selecto buttons */
