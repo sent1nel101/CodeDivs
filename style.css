@@ -65,7 +65,7 @@ body{
 .contentWrapper{
     width: 100vw;
     display: flex;
-    height: 90vh;
+    height: calc(100vh - 66px);
 }
 .text-area{
     width: 100%;
@@ -78,12 +78,14 @@ textarea {
   }
 /* styles for code containers */
 .html, .css, .javascript, .output{
-    height: 90vh;
+    height: calc(100vh - 66px);
     width: 100%;
     border: 1px solid #333;
     display: inline-block;
     border-left: none;
+    border-color: grey;
 }
+
 /*   styles for pseudoelements and alternate states  */
 
 
@@ -151,6 +153,9 @@ textarea {
 @media screen and (max-width: 750px){
     .contentWrapper{
         flex-direction: column;
+    }
+    .html, .css, .javascript, .output{
+        border-bottom: none;
     }
     #logo{
         width: 300px;
