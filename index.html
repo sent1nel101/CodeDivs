@@ -5,37 +5,60 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CodeBox</title>
+    <!-- Google FONTS family "Lato" -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">
+    <!-- jQuery STYLESHEET -->
     <link
       rel="stylesheet"
       href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css"
     />
+    <!-- Personal STYLESHEET -->
     <link rel="stylesheet" href="style.css" />
+    <!-- jQuery and jQuery UI SCRIPTS. Loading with document ready function -->
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
-  </body>
-   
+  </body>   
   </head>
     <body>
+<!-- START header with logo, toggler, and panel selectors -->
     <div class="header">
+<!-- START logo container -->
         <div id="logo">
-            <h1>CodeBox</h1>
+            <h1>CodeDivs</h1>
             <span id="logo-sub"> &lt;&gt;Coding-SandBox&lt;/&gt;</span>
         </div>
+<!-- END logo container -->
+
+<!-- START toggler container: toggle panels vertically or horizontally-->
+        <div class="toggleWrapper">
+          <span style="font-variant: small-caps">toggle view</span>
+          <div id="toggle-view-box"><div id="toggler"></div></div>
+        </div>
+<!-- END toggler container -->
+
+<!-- START selector button container -->
         <div class="buttonContainer">    
             <div class="toggleButton selected" id="htmlBtn">HTML</div>
-            <div class="toggleButton" id="cssBtn">CSS</div>
+            <div class="toggleButton selected" id="cssBtn">CSS</div>
             <div class="toggleButton" id="javascriptBtn">JavaScript</div>
             <div class="toggleButton selected" id="outputBtn">Output</div> 
         </div>
     </div>
-   
+<!-- END selector container -->
+<!-- END header and brand section -->
+
+<!-- START content section: textareas and view panel -->
     <div class="contentWrapper">
         <div class="html"><textarea id="html-text-area" class="text-area">&lt;p&gt;Hello World!&lt;/p&gt;</textarea></div>
-        <div class="css hidden"><textarea id="css-text-area" class="text-area">*, body, html { margin: 0; padding: 0}</textarea></div>
-        <div class="javascript hidden"><textarea id="javascript-text-area" class="text-area">alert("Let's start coding! Begin by clearing the JavaScript panel to remove me.")</textarea></div>
+        <div class="css"><textarea id="css-text-area" class="text-area">html{padding: 1rem}</textarea></div>
+        <div class="javascript hidden"><textarea id="javascript-text-area" class="text-area">// enter your JS code here =)</textarea></div>
         <iframe class="output" id="output-text"></iframe>
     </div>
+<!-- END content section -->
 
+<!-- personal script tag -->
       <script src="./script.js"></script>
     </body>
 </html>

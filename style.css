@@ -51,6 +51,7 @@ body{
     background: white;
     color: #4d4d4d;
     border-right: none;
+    box-shadow: 5px 5px 5px #000;
 }
 
 
@@ -71,8 +72,36 @@ body{
     width: 100%;
     height: 100%;
     padding: 2rem 1rem;
+    font-size: 16px;
+    /* background: rgba(247, 252, 225, 0.356); */
 }
 
+#toggle-view-box{
+    width: 40px;
+    height: 20px;
+    border-radius: 30%;
+    background: white;
+    margin: 0 10px;
+    position: relative;
+    outline: 1px solid black;
+}
+#toggler{
+    background: #4d4d4d;
+    border: 1px solid black;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    position: relative;
+    top: 1px;
+    left: 2px;
+    cursor: pointer;
+}
+.toggleWrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
 textarea {
     resize: none;
   }
@@ -92,18 +121,25 @@ textarea {
 .toggleButton:hover{
     background: lightgrey;
     cursor: pointer;
-    transform: scale(.95)
 }
 .toggleButton:active{
     background: lightgrey;
 }
 .selected{
     background: lightsteelblue;
-    transform: scale(.95)
+    transform: scale(.95);
+    box-shadow: 3px 3px 3px #000;
 }
 .hidden{
     display: none;
 }
+.toggled{
+    transform: translateX(17px)
+}
+.wrapperToggled{
+    flex-direction: column;
+}
+
 
 /* media queries for smaller screens */
 @media screen and (max-width: 1300px){
