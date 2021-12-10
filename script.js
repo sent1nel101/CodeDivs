@@ -4,6 +4,7 @@ $(function () {
     $('.toggleButton').on('click', function(){
         $(this).toggleClass('selected');
     })
+    
 // toggle the horizontal and vertical view of panels and set visual style of the toggler
 $('#toggler').on('click', function(){
     $('.contentWrapper').toggleClass('wrapperToggled')
@@ -42,6 +43,8 @@ $('#toggler').on('click', function(){
     $('iframe').contents().find("html").html('<style type="text/css" >' + $('#css-text-area').val() + '</style>' + $('#html-text-area').val());
     document.getElementById("output-text").contentWindow.eval($("#javascript-text-area").val())
     }
+
+    // create function to update panels on page load
     window.onload = function(){
         updateContent()
     }

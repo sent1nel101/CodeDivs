@@ -13,30 +13,41 @@ body{
     background: #4d4d4d;
     color: white;
 }
+            /* styles for branding section of header */
+            /* container for branding elements */
+            #logo{
+                width: 30%;
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                padding: 1rem;
+                font-size: 28px;
+                font-weight: bold;
+                color:lightsteelblue;
+                margin-left: 1rem;
+            }
+            /* brand title CodeDiv */
+            #logo h1{
+                font-size: 28px;
+                display: inline;
+                text-decoration: overline;
+                border-bottom: 2px solid lightsteelblue;
+            }
+            /* brand sub text <>coding-sandbox</>*/
+            #logo-sub{
+                font-size: 14px; 
+                color: white; 
+                letter-spacing: .3em; 
+                font-weight: normal
+            }
 
-#logo{
-    width: 30%;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 1rem;
-    font-size: 28px;
-    font-weight: bold;
-    color:lightsteelblue;
-    margin-left: 1rem;
-}
-#logo h1{
-    font-size: 28px;
-    display: inline;
-    text-decoration: overline;
-    border-bottom: 2px solid lightsteelblue;
-}
-#logo-sub{
-    font-size: 14px; 
-    color: white; 
-    letter-spacing: .3em; 
-    font-weight: normal
-}
+            #logo-me{
+                padding: 1rem;
+                font-size: 12px;
+                margin-top: 10px;
+            }
+
+/* container for selecto buttons */
 .buttonContainer{
     display: flex;
     padding: 10px;
@@ -44,6 +55,7 @@ body{
     margin: 0 auto;
 }
 
+/* styles for individual selector buttons */
 .toggleButton{
     border: 1px solid #333;
     padding:  10px;
@@ -54,7 +66,7 @@ body{
     box-shadow: 5px 5px 5px #000;
 }
 
-
+/* define rounded borders for outside elements of selector panel */
 #htmlBtn{
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
@@ -63,11 +75,15 @@ body{
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
 }
+
+/* container for input and output panels */
 .contentWrapper{
     width: 100vw;
     display: flex;
     height: calc(100vh - 66px);
 }
+
+/* general styles for all input panels */
 .text-area{
     width: 100%;
     height: 100%;
@@ -76,36 +92,43 @@ body{
     /* background: rgba(247, 252, 225, 0.356); */
 }
 
-#toggle-view-box{
-    width: 40px;
-    height: 20px;
-    border-radius: 30%;
-    background: white;
-    margin: 0 10px;
-    position: relative;
-    outline: 1px solid black;
-}
-#toggler{
-    background: #4d4d4d;
-    border: 1px solid black;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    position: relative;
-    top: 1px;
-    left: 2px;
-    cursor: pointer;
-}
-.toggleWrapper{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-}
+        /* container for vertical-horizontal toggler and description */
+        #toggle-view-box{
+            width: 40px;
+            height: 20px;
+            border-radius: 30%;
+            background: white;
+            margin: 0 10px;
+            position: relative;
+            outline: 1px solid black;
+        }
+
+        /* vertical-horizontal toggle button */
+        #toggler{
+            background: #4d4d4d;
+            border: 1px solid black;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            position: relative;
+            top: 1px;
+            left: 2px;
+            cursor: pointer;
+        }
+        /* slide container for toggler */
+        .toggleWrapper{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        
+/* remove resizable feature of textareas */
 textarea {
     resize: none;
   }
-/* styles for code containers */
+
+/* styles for input panels */
 .html, .css, .javascript, .output{
     height: calc(100vh - 66px);
     width: 100%;
@@ -115,33 +138,43 @@ textarea {
     border-color: grey;
 }
 
-/*   styles for pseudoelements and alternate states  */
 
+/*   styles for pseudoelements and alternate states  */
 
 .toggleButton:hover{
     background: lightgrey;
     cursor: pointer;
 }
+
 .toggleButton:active{
     background: lightgrey;
 }
+
+/* styles for selected panel buttons */
 .selected{
     background: lightsteelblue;
     transform: scale(.95);
     box-shadow: 3px 3px 3px #000;
 }
+
+/* styles for hidden panels */
 .hidden{
     display: none;
 }
+
+/* styles for vertical/horizontal toggler */
 .toggled{
     transform: translateX(17px)
 }
+
+/* styles for vertical alignment of panels */
 .wrapperToggled{
     flex-direction: column;
 }
 
 
 /* media queries for smaller screens */
+
 @media screen and (max-width: 1300px){
     #logo h1{
         font-size: 24px;
@@ -149,8 +182,8 @@ textarea {
     #logo-sub{
         letter-spacing: .2em;
     }
-
 }
+
 @media screen and (max-width: 1150px){
     #logo{
         margin-left: 20px;
@@ -162,8 +195,12 @@ textarea {
         font-size: 12px;
         letter-spacing: .15em;
     }
-
+    .toggleWrapper{
+        flex-direction:column;
+        font-size: 12px;
+    }
 }
+
 @media screen and (max-width: 980px){
     #logo{
         margin-left: 12px;
@@ -185,7 +222,11 @@ textarea {
         padding:  8px;
         padding-top: 10px;
     }
+    .toggleWrapper span{
+        display: none;
+    }
 }
+
 @media screen and (max-width: 750px){
     .contentWrapper{
         flex-direction: column;
@@ -210,6 +251,9 @@ textarea {
     .header{
         justify-content: center;
     }
+    .toggleWrapper{
+        display: none;
+    }
 }
 
 @media screen and (max-width: 460px){
@@ -233,6 +277,7 @@ textarea {
         padding: 0;
     }
 }
+
 @media screen and (max-width: 350px){
     .header{
         margin: 0;
