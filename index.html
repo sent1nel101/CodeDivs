@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jQuery UI CodeBox</title>
+    <link
+      rel="stylesheet"
+      href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+  </body>
+   
+  </head>
+    <body>
+    <div class="header">
+        <div id="logo">
+            <h1>CodeBox</h1>
+            <span style="font-size: 14px; color: white; letter-spacing: .3em; font-weight: normal"> &lt;&gt;Coding-SandBox&lt;/&gt;</span>
+        </div>
+        <div class="buttonContainer">    
+            <div class="toggleButton selected" id="htmlBtn">HTML</div>
+            <div class="toggleButton" id="cssBtn">CSS</div>
+            <div class="toggleButton" id="javascriptBtn">JavaScript</div>
+            <div class="toggleButton selected" id="outputBtn">Output</div> 
+        </div>
+    </div>
+   
+    <div class="contentWrapper">
+        <div class="html"><textarea id="html-text-area" class="text-area">&lt;p&gt;Hello World!&lt;/p&gt;</textarea></div>
+        <div class="css hidden"><textarea id="css-text-area" class="text-area">*, body, html { margin: 0; padding: 0}</textarea></div>
+        <div class="javascript hidden"><textarea id="javascript-text-area" class="text-area">alert("Let's start coding!")</textarea></div>
+        <iframe class="output" id="output-text"></iframe>
+    </div>
+
+    <script>
+        $(function () {
+        
+            $('.toggleButton').on('click', function(){
+                $(this).toggleClass('selected');
+            })
+
+            $('#htmlBtn').on('click', function(){
+                $('.html').toggleClass('hidden')
+            })
+            $('#cssBtn').on('click', function(){
+                $('.css').toggleClass('hidden')
+            })
+            $('#javascriptBtn').on('click', function(){
+                $('.javascript').toggleClass('hidden')
+            })
+            $('#outputBtn').on('click', function(){
+                $('.output').toggleClass('hidden')
+            })
+
+            //set the content of the iframe
+            $("#html-text-area").on('change keyup paste', function(){
+                updateContent()                
+            })
+
+            $("#css-text-area").on('change keyup paste', function(){
+                updateContent()                
+            })
+
+            $("#javascript-text-area").on('change keyup paste', function(){
+                updateContent()                
+            })
+
+            function updateContent(){
+            $('iframe').contents().find("html").html('<style type="text/css" >' + $('#css-text-area').val() + '</style>' + $('#html-text-area').val());
+            document.getElementById("output-text").contentWindow.eval($("#javascript-text-area").val())
+            }
+
+
+        })
+      </script>
+    </body>
+</html>
+
+
