@@ -1,4 +1,12 @@
+ // emmet trial
+ emmet.require('textarea').setup({
+    pretty_break: true, // enable formatted line breaks (when inserting 
+                        // between opening and closing tag) 
+    use_tab: true       // expand abbreviations by Tab key
+});
+
 $(function () {
+   
 // create toggles to HIDE and SHOW input and output panels   
 // set the visual styles on panel buttons to show which panels are active.
     $('.toggleButton').on('click', function(){
@@ -48,5 +56,31 @@ $('#toggler').on('click', function(){
     window.onload = function(){
         updateContent()
     }
+
+
+    var htmlEditor = document.getElementById("html-text-area");
+       
+    htmlEditor.addEventListener("keyup", function() {
+        localStorage.setItem("HtmlTextEditorData", htmlEditor.value) 
+         });
+    if (window.localStorage["HtmlTextEditorData"]) {
+        htmlEditor.value = localStorage.getItem("HtmlTextEditorData", htmlEditor) ;
+    } 
+
+    var cssEditor = document.querySelector("#css-text-area");
+    cssEditor.addEventListener("keyup", function() {
+        localStorage.setItem("CssTextEditorData", cssEditor.value) 
+         });
+    if (window.localStorage["CssTextEditorData"]) {
+        cssEditor.value = localStorage.getItem("CssTextEditorData", cssEditor) ;
+    } 
+
+    var javascriptEditor = document.querySelector("#javascript-text-area");
+    javascriptEditor.addEventListener("keyup", function() {
+        localStorage.setItem("JavascriptTextEditorData", javascriptEditor.value) 
+         });
+    if (window.localStorage["JavascriptTextEditorData"]) {
+        javascriptEditor.value = localStorage.getItem("JavascriptTextEditorData", javascriptEditor) ;
+    } 
 
 })
