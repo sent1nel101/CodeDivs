@@ -57,7 +57,8 @@ $('#toggler').on('click', function(){
         updateContent()
     }
 
-
+// connect textareas to local storage for save feature on page refresh
+// pull  HTML values from local storage when the page loads and store in local storage on keyup
     var htmlEditor = document.getElementById("html-text-area");
        
     htmlEditor.addEventListener("keyup", function() {
@@ -67,6 +68,8 @@ $('#toggler').on('click', function(){
         htmlEditor.value = localStorage.getItem("HtmlTextEditorData", htmlEditor) ;
     } 
 
+
+// pull  CSS values from local storage when the page loads and store in local storage on keyup
     var cssEditor = document.querySelector("#css-text-area");
     cssEditor.addEventListener("keyup", function() {
         localStorage.setItem("CssTextEditorData", cssEditor.value) 
@@ -75,6 +78,8 @@ $('#toggler').on('click', function(){
         cssEditor.value = localStorage.getItem("CssTextEditorData", cssEditor) ;
     } 
 
+
+// pull  JavaScript values from local storage when the page loads and store in local storage on keyup
     var javascriptEditor = document.querySelector("#javascript-text-area");
     javascriptEditor.addEventListener("keyup", function() {
         localStorage.setItem("JavascriptTextEditorData", javascriptEditor.value) 
