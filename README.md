@@ -1,4 +1,4 @@
-This is a coding sandbox app for practicing HTML, CSS, and JavaScript <br>
+This is a coding sandbox webpage for practicing HTML, CSS, and JavaScript <br>
 in a live enviornment without a full IDE or code editor. <br>
 Practice coding on the go or try things out before committing.
 
