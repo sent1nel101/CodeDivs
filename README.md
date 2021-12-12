@@ -1,4 +1,5 @@
-This is a coding sandbox app for practicing HTML, CSS, and JavaScript in a live enviornment without a full IDE or code editor.
+This is a coding sandbox app for practicing HTML, CSS, and JavaScript <br>
+in a live enviornment without a full IDE or code editor. <br>
 Practice coding on the go or try things out before committing.
 
 The HTML field allows emmet autocomplete on TAB press. <br>
