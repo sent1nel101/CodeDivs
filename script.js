@@ -57,8 +57,7 @@ $('#toggler').on('click', function(){
         updateContent()
     }
 
-// connect textareas to local storage for save feature on page refresh
-// pull  HTML values from local storage when the page loads and store in local storage on keyup
+
     var htmlEditor = document.getElementById("html-text-area");
        
     htmlEditor.addEventListener("keyup", function() {
@@ -68,8 +67,6 @@ $('#toggler').on('click', function(){
         htmlEditor.value = localStorage.getItem("HtmlTextEditorData", htmlEditor) ;
     } 
 
-
-// pull  CSS values from local storage when the page loads and store in local storage on keyup
     var cssEditor = document.querySelector("#css-text-area");
     cssEditor.addEventListener("keyup", function() {
         localStorage.setItem("CssTextEditorData", cssEditor.value) 
@@ -78,8 +75,6 @@ $('#toggler').on('click', function(){
         cssEditor.value = localStorage.getItem("CssTextEditorData", cssEditor) ;
     } 
 
-
-// pull  JavaScript values from local storage when the page loads and store in local storage on keyup
     var javascriptEditor = document.querySelector("#javascript-text-area");
     javascriptEditor.addEventListener("keyup", function() {
         localStorage.setItem("JavascriptTextEditorData", javascriptEditor.value) 
@@ -87,5 +82,38 @@ $('#toggler').on('click', function(){
     if (window.localStorage["JavascriptTextEditorData"]) {
         javascriptEditor.value = localStorage.getItem("JavascriptTextEditorData", javascriptEditor) ;
     } 
+
+
+
+    // create a download file of the textareas
+   /*   function download(){
+        var fullText = [];
+        var htmlText = document.getElementById("html-text-area").value;
+        var cssText = document.getElementById("css-text-area").value;
+        var javascriptText = document.getElementById("javascript-text-area").value;
+        fullText = [htmlText, cssText, javascriptText]
+        var blob = new Blob([fullText], { type: "text/plain"});
+        var anchor = document.createElement("a");
+        anchor.download = "code-div.txt";
+        anchor.href = window.URL.createObjectURL(blob);
+        anchor.target ="_blank";
+        anchor.style.display = "none"; // just to be safe!
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+    }  */
+
+
+    $(function() {
+        $('#saveToFile').click(function(e) {
+          var data = document.getElementById('html-text-area').value + document.getElementById('css-text-area').value + document.getElementById('javascript-text-area').value;
+          var data = 'data:application/csv;charset=utf-8,' + encodeURIComponent(data);
+          var el = e.currentTarget;
+          el.href = data;
+          el.target = '_blank';
+          el.download = 'code-divs.txt';
+        });
+      });
+
 
 })
