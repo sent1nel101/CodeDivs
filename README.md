@@ -1,3 +1,5 @@
+HTML, CSS, JavaScript
+
 - This is a coding sandbox webpage for practicing HTML, CSS, and JavaScript <br>
   in a live enviornment without a full IDE or code editor. <br>
 
