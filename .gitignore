@@ -1,0 +1,23 @@
+# Agent tracking files (internal use only)
+TODO.md
+WORKING.md
+SUMMARY.md
+AGENTS.md
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*

@@ -1,0 +1,331 @@
+*,
+body,
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+}
+/* styles for header section */
+.header {
+  display: flex;
+  background: #0d0d0d;
+  color: white;
+}
+/* styles for branding section of header */
+/* container for branding elements */
+#logo {
+  width: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 1rem;
+  font-size: 28px;
+  font-weight: bold;
+  color: lightsteelblue;
+  margin-left: 1rem;
+}
+/* brand title CodeDiv */
+#logo h1 {
+  font-size: 28px;
+  display: inline;
+  text-decoration: overline;
+  border-bottom: 2px solid lightsteelblue;
+}
+/* brand sub text <>coding-sandbox</>*/
+#logo-sub {
+  font-size: 14px;
+  color: white;
+  letter-spacing: 0.3em;
+  font-weight: normal;
+}
+
+#logo-me {
+  padding: 1rem;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  color: lightsteelblue;
+}
+
+/* container for selecto buttons */
+.buttonContainer {
+  display: flex;
+  padding: 10px;
+  width: 40%;
+  margin: 0 auto;
+}
+
+/* styles for individual selector buttons */
+.toggleButton {
+  border: 1px solid #333;
+  padding: 10px;
+  padding-top: 13px;
+  background: white;
+  color: #4d4d4d;
+  border-right: none;
+  box-shadow: 5px 5px 5px #000;
+}
+
+/* save button */
+.saveButton {
+  border: 1px solid #333;
+  padding: 10px;
+  background: rgb(104, 160, 206);
+  color: white;
+  border-right: none;
+  box-shadow: 5px 5px 5px #000;
+  text-decoration: none;
+  height: 40px;
+  width: 100px;
+  text-align: center;
+  border-radius: 10px;
+  margin: auto 0;
+}
+
+/* define rounded borders for outside elements of selector panel */
+#htmlBtn {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+#outputBtn {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* container for input and output panels */
+.contentWrapper {
+  width: 100vw;
+  display: flex;
+  height: calc(100vh - 66px);
+}
+
+/* general styles for all input panels */
+.text-area {
+  width: 100%;
+  height: 100%;
+  padding: 2rem 1rem;
+  font-size: 16px;
+  background: rgba(27, 27, 27);
+  color: #f0f0f0;
+}
+
+/* container for vertical-horizontal toggler and description */
+#toggle-view-box {
+  width: 40px;
+  height: 20px;
+  border-radius: 30%;
+  background: white;
+  margin: 0 10px;
+  position: relative;
+  outline: 1px solid black;
+}
+
+/* vertical-horizontal toggle button */
+#toggler {
+  background: rgba(27, 27, 27);
+  border: 1px solid black;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  position: relative;
+  top: 1px;
+  left: 2px;
+  cursor: pointer;
+}
+/* slide container for toggler */
+.toggleWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+/* remove resizable feature of textareas */
+textarea {
+  resize: none;
+}
+
+/* styles for input panels */
+.html,
+.css,
+.javascript {
+  height: calc(100vh - 66px);
+  width: 100%;
+  border: 1px solid #333;
+  display: inline-block;
+  background-color: rgba(27, 27, 27);
+  color: #f0f0f0;
+  border-left: none;
+  border-color: grey;
+}
+
+.output {
+  height: calc(100vh - 66px);
+  width: 100%;
+  border: 1px solid #333;
+  display: inline-block;
+  border-left: none;
+  border-color: grey;
+}
+/*   styles for pseudoelements and alternate states  */
+
+.toggleButton:hover {
+  background: lightgrey;
+  cursor: pointer;
+}
+
+.toggleButton:active {
+  background: lightgrey;
+}
+
+/* styles for selected panel buttons */
+.selected {
+  background: lightsteelblue;
+  transform: scale(0.95);
+  box-shadow: 3px 3px 3px #000;
+}
+
+/* styles for hidden panels */
+.hidden {
+  display: none;
+}
+
+/* styles for vertical/horizontal toggler */
+.toggled {
+  transform: translateX(17px);
+}
+
+/* styles for vertical alignment of panels */
+.wrapperToggled {
+  flex-direction: column;
+}
+
+/* media queries for smaller screens */
+
+@media screen and (max-width: 1300px) {
+  #logo h1 {
+    font-size: 24px;
+  }
+  #logo-sub {
+    letter-spacing: 0.2em;
+  }
+}
+
+@media screen and (max-width: 1150px) {
+  #logo {
+    margin-left: 20px;
+  }
+  #logo h1 {
+    font-size: 22px;
+  }
+  #logo-sub {
+    font-size: 12px;
+    letter-spacing: 0.15em;
+  }
+  .toggleWrapper {
+    flex-direction: column;
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 980px) {
+  #logo {
+    margin-left: 12px;
+  }
+  #logo h1 {
+    font-size: 24px;
+  }
+  #logo-sub {
+    display: none;
+  }
+
+  .buttonContainer {
+    padding: 8px;
+    width: 50%;
+    margin-right: 10px;
+  }
+
+  .toggleButton {
+    padding: 8px;
+    padding-top: 10px;
+  }
+  .toggleWrapper span {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .contentWrapper {
+    flex-direction: column;
+  }
+  .html,
+  .css,
+  .javascript,
+  .output {
+    border-bottom: none;
+  }
+  #logo {
+    width: 300px;
+  }
+  #logo h1 {
+    font-size: 22px;
+  }
+  #logo-sub {
+    font-size: 10px;
+  }
+  .toggleButton {
+    padding: 5px;
+    padding-top: 13px;
+    font-size: 14px;
+  }
+  .header {
+    justify-content: center;
+  }
+  .toggleWrapper {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 460px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+  }
+  #logo {
+    display: inline;
+    width: 100vw;
+    margin: 0 auto;
+    padding: 10px;
+  }
+  #logo h1 {
+    position: relative;
+    left: 38%;
+  }
+  .buttonContainer {
+    margin: 10px;
+    padding: 0;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .header {
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+  }
+  #logo {
+    justify-content: center;
+    align-items: center;
+  }
+  .buttonContainer {
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    margin: 10px;
+  }
+}
