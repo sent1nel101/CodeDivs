@@ -1,3 +1,26 @@
+/* ============================================
+   CodeDivs - Apple-Inspired Dark Theme
+   Modern, sleek, minimalist design
+   ============================================ */
+
+/* CSS Variables for consistent theming */
+:root {
+  --bg-primary: #1d1d1f;
+  --bg-secondary: #161617;
+  --bg-elevated: #2d2d30;
+  --accent-blue: #0071e3;
+  --accent-blue-hover: #0077ed;
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-medium: rgba(255, 255, 255, 0.18);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+}
+
 *,
 body,
 html {
@@ -7,253 +30,340 @@ html {
 }
 
 body {
-  font-family: sans-serif;
+  font-family: var(--font-system);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
 }
-/* styles for header section */
+
+/* ============================================
+   Header / Navigation Bar
+   ============================================ */
 .header {
   display: flex;
-  background: #0d0d0d;
-  color: white;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(29, 29, 31, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 2rem;
+  height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
 }
-/* styles for branding section of header */
-/* container for branding elements */
+
+/* Logo Section */
 #logo {
-  width: 30%;
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  padding: 1rem;
-  font-size: 28px;
-  font-weight: bold;
-  color: lightsteelblue;
-  margin-left: 1rem;
+  gap: 1.25rem;
+  flex-shrink: 0;
+  margin-right: 2rem;
 }
-/* brand title CodeDiv */
+
 #logo h1 {
-  font-size: 28px;
-  display: inline;
-  text-decoration: overline;
-  border-bottom: 2px solid lightsteelblue;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin: 0;
+  padding-right: 1rem;
+  border-right: 1px solid var(--border-subtle);
 }
-/* brand sub text <>coding-sandbox</>*/
+
 #logo-sub {
-  font-size: 14px;
-  color: white;
-  letter-spacing: 0.3em;
-  font-weight: normal;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding-left: 0.25rem;
 }
 
 #logo-me {
-  padding: 1rem;
-  font-size: 0.75rem;
-  margin-top: 0.5rem;
-  color: lightsteelblue;
-}
-
-/* container for selecto buttons */
-.buttonContainer {
-  display: flex;
-  padding: 10px;
-  width: 40%;
-  margin: 0 auto;
-}
-
-/* styles for individual selector buttons */
-.toggleButton {
-  border: 1px solid #333;
-  padding: 10px;
-  padding-top: 13px;
-  background: white;
-  color: #4d4d4d;
-  border-right: none;
-  box-shadow: 5px 5px 5px #000;
-}
-
-/* save button */
-.saveButton {
-  border: 1px solid #333;
-  padding: 10px;
-  background: rgb(104, 160, 206);
-  color: white;
-  border-right: none;
-  box-shadow: 5px 5px 5px #000;
-  text-decoration: none;
-  height: 40px;
-  width: 100px;
-  text-align: center;
-  border-radius: 10px;
-  margin: auto 0;
-}
-
-/* define rounded borders for outside elements of selector panel */
-#htmlBtn {
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-}
-#outputBtn {
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
-/* container for input and output panels */
-.contentWrapper {
-  width: 100vw;
-  display: flex;
-  height: calc(100vh - 66px);
-}
-
-/* general styles for all input panels */
-.text-area {
-  width: 100%;
-  height: 100%;
-  padding: 2rem 1rem;
-  font-size: 16px;
-  background: rgba(27, 27, 27);
-  color: #f0f0f0;
-}
-
-/* container for vertical-horizontal toggler and description */
-#toggle-view-box {
-  width: 40px;
-  height: 20px;
-  border-radius: 30%;
-  background: white;
-  margin: 0 10px;
-  position: relative;
-  outline: 1px solid black;
-}
-
-/* vertical-horizontal toggle button */
-#toggler {
-  background: rgba(27, 27, 27);
-  border: 1px solid black;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  position: relative;
-  top: 1px;
-  left: 2px;
-  cursor: pointer;
-}
-/* slide container for toggler */
-.toggleWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
-
-/* remove resizable feature of textareas */
-textarea {
-  resize: none;
-}
-
-/* styles for input panels */
-.html,
-.css,
-.javascript {
-  height: calc(100vh - 66px);
-  width: 100%;
-  border: 1px solid #333;
-  display: inline-block;
-  background-color: rgba(27, 27, 27);
-  color: #f0f0f0;
-  border-left: none;
-  border-color: grey;
-}
-
-.output {
-  height: calc(100vh - 66px);
-  width: 100%;
-  border: 1px solid #333;
-  display: inline-block;
-  border-left: none;
-  border-color: grey;
-}
-/*   styles for pseudoelements and alternate states  */
-
-.toggleButton:hover {
-  background: lightgrey;
-  cursor: pointer;
-}
-
-.toggleButton:active {
-  background: lightgrey;
-}
-
-/* styles for selected panel buttons */
-.selected {
-  background: lightsteelblue;
-  transform: scale(0.95);
-  box-shadow: 3px 3px 3px #000;
-}
-
-/* styles for hidden panels */
-.hidden {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 400;
   display: none;
 }
 
-/* styles for vertical/horizontal toggler */
-.toggled {
-  transform: translateX(17px);
+/* Toggle View Switch */
+.toggleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  margin-right: 1.5rem;
 }
 
-/* styles for vertical alignment of panels */
+#toggle-view-box {
+  width: 51px;
+  height: 31px;
+  border-radius: 16px;
+  background: var(--bg-elevated);
+  position: relative;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  border: 1.5px solid var(--border-subtle);
+}
+
+#toggle-view-box:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+#toggler {
+  position: absolute;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  top: 2px;
+  left: 2px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.toggled {
+  transform: translateX(20px);
+}
+
+/* Panel Selector Buttons */
+.buttonContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 auto;
+}
+
+.toggleButton {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  border-radius: 980px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.toggleButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.toggleButton.selected {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+/* Save Button */
+.saveButton {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 980px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0, 113, 227, 0.3);
+}
+
+.saveButton:hover {
+  background: var(--accent-blue-hover);
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.4);
+  transform: translateY(-1px);
+}
+
+.saveButton:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   Content / Editor Area
+   ============================================ */
+.contentWrapper {
+  width: 100vw;
+  height: calc(100vh - 52px);
+  display: flex;
+  background: var(--bg-secondary);
+}
+
 .wrapperToggled {
   flex-direction: column;
 }
 
-/* media queries for smaller screens */
+/* Editor Panels */
+.html,
+.css,
+.javascript {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border-medium);
+  position: relative;
+  overflow: hidden;
+}
 
+.html {
+  border-left: none;
+}
+
+.javascript {
+  border-right: 1px solid var(--border-medium);
+}
+
+.output {
+  flex: 1;
+  background: white;
+  border: none;
+  display: block;
+}
+
+/* Textareas */
+.text-area {
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem;
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', monospace;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: none;
+  outline: none;
+  resize: none;
+  caret-color: var(--accent-blue);
+  letter-spacing: 0.3px;
+  tab-size: 4;
+  -moz-tab-size: 4;
+}
+
+.text-area::selection {
+  background: rgba(0, 113, 227, 0.3);
+}
+
+.text-area::-webkit-scrollbar {
+  width: 12px;
+}
+
+.text-area::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.text-area::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 6px;
+  border: 3px solid var(--bg-secondary);
+}
+
+.text-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Autocomplete Dropdown */
+#autocomplete-dropdown {
+  background: rgba(45, 45, 48, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+#autocomplete-dropdown div {
+  padding: 8px 12px;
+  font-family: 'SF Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-left: 2px solid transparent;
+}
+
+#autocomplete-dropdown div:hover {
+  background: rgba(0, 113, 227, 0.2);
+  border-left-color: var(--accent-blue);
+}
+
+/* ============================================
+   States & Utilities
+   ============================================ */
+.hidden {
+  display: none !important;
+}
+
+/* Vertical orientation (stacked panels) */
+.wrapperToggled .html,
+.wrapperToggled .css,
+.wrapperToggled .javascript {
+  border-right: none;
+  border-bottom: 1px solid var(--border-medium);
+}
+
+.wrapperToggled .javascript {
+  border-bottom: 1px solid var(--border-medium);
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
 @media screen and (max-width: 1300px) {
   #logo h1 {
-    font-size: 24px;
+    font-size: 19px;
   }
   #logo-sub {
-    letter-spacing: 0.2em;
+    font-size: 11px;
   }
 }
 
 @media screen and (max-width: 1150px) {
-  #logo {
-    margin-left: 20px;
+  .header {
+    padding: 0 1.5rem;
   }
-  #logo h1 {
-    font-size: 22px;
-  }
+  
   #logo-sub {
-    font-size: 12px;
-    letter-spacing: 0.15em;
+    display: none;
   }
-  .toggleWrapper {
-    flex-direction: column;
-    font-size: 12px;
+  
+  .toggleWrapper span {
+    display: none;
   }
 }
 
 @media screen and (max-width: 980px) {
-  #logo {
-    margin-left: 12px;
+  .header {
+    height: auto;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
-  #logo h1 {
-    font-size: 24px;
-  }
-  #logo-sub {
-    display: none;
-  }
-
+  
   .buttonContainer {
-    padding: 8px;
-    width: 50%;
-    margin-right: 10px;
+    order: 3;
+    width: 100%;
+    justify-content: center;
   }
-
-  .toggleButton {
-    padding: 8px;
-    padding-top: 10px;
-  }
-  .toggleWrapper span {
-    display: none;
+  
+  .saveButton {
+    order: 2;
   }
 }
 
@@ -261,71 +371,81 @@ textarea {
   .contentWrapper {
     flex-direction: column;
   }
+  
   .html,
   .css,
-  .javascript,
-  .output {
-    border-bottom: none;
+  .javascript {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
   }
-  #logo {
-    width: 300px;
-  }
+  
   #logo h1 {
-    font-size: 22px;
-  }
-  #logo-sub {
-    font-size: 10px;
-  }
-  .toggleButton {
-    padding: 5px;
-    padding-top: 13px;
-    font-size: 14px;
-  }
-  .header {
-    justify-content: center;
-  }
-  .toggleWrapper {
-    display: none;
+    font-size: 18px;
   }
 }
 
 @media screen and (max-width: 460px) {
   .header {
-    flex-direction: column;
-    align-items: center;
-    width: 100vw;
+    padding: 0.5rem;
   }
+  
   #logo {
-    display: inline;
-    width: 100vw;
-    margin: 0 auto;
-    padding: 10px;
+    flex: 1;
+    justify-content: center;
   }
-  #logo h1 {
-    position: relative;
-    left: 38%;
+  
+  .toggleWrapper {
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
   }
+  
   .buttonContainer {
-    margin: 10px;
-    padding: 0;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+  
+  .toggleButton {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+  
+  .saveButton {
+    padding: 5px 12px;
+    font-size: 12px;
   }
 }
 
-@media screen and (max-width: 350px) {
-  .header {
-    margin: 0;
-    padding: 0;
-    justify-content: center;
-    align-items: center;
+/* ============================================
+   Smooth Animations
+   ============================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
   }
-  #logo {
-    justify-content: center;
-    align-items: center;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  .buttonContainer {
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    margin: 10px;
-  }
+}
+
+#autocomplete-dropdown {
+  animation: fadeIn 0.15s ease;
+}
+
+/* Panel transitions */
+.html,
+.css,
+.javascript,
+.output {
+  transition: flex 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover effects for interactive elements */
+.toggleButton,
+.saveButton,
+#toggle-view-box,
+#toggler {
+  will-change: transform;
 }

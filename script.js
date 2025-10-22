@@ -13,6 +13,37 @@ function insertTab(textarea) {
     textarea.selectionStart = textarea.selectionEnd = start + 1;
 }
 
+// Helper function to remove indentation (outdent)
+function removeTab(textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    // Find the start of the current line
+    let lineStart = start;
+    while (lineStart > 0 && text[lineStart - 1] !== '\n') {
+        lineStart--;
+    }
+    
+    // Check if line starts with tab or spaces
+    if (text[lineStart] === '\t') {
+        // Remove one tab
+        textarea.value = text.slice(0, lineStart) + text.slice(lineStart + 1);
+        textarea.selectionStart = Math.max(lineStart, start - 1);
+        textarea.selectionEnd = Math.max(lineStart, end - 1);
+    } else if (text.slice(lineStart, lineStart + 4) === '    ') {
+        // Remove 4 spaces
+        textarea.value = text.slice(0, lineStart) + text.slice(lineStart + 4);
+        textarea.selectionStart = Math.max(lineStart, start - 4);
+        textarea.selectionEnd = Math.max(lineStart, end - 4);
+    } else if (text.slice(lineStart, lineStart + 2) === '  ') {
+        // Remove 2 spaces
+        textarea.value = text.slice(0, lineStart) + text.slice(lineStart + 2);
+        textarea.selectionStart = Math.max(lineStart, start - 2);
+        textarea.selectionEnd = Math.max(lineStart, end - 2);
+    }
+}
+
 // Snippet expansion function
 function tryExpandSnippet(textarea) {
     if (!textarea.snippets) return false;
@@ -797,6 +828,14 @@ $('#toggler').on('click', function(){
     // HTML editor: Check for snippet expansion before Emmet
     htmlEditor.addEventListener('keydown', function(e) {
         if (e.key === 'Tab') {
+            // Handle Shift+Tab for outdenting
+            if (e.shiftKey) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                removeTab(this);
+                return;
+            }
+            
             // Close autocomplete dropdown on Tab
             const dropdown = document.getElementById('autocomplete-dropdown');
             if (dropdown && dropdown.style.display !== 'none' && dropdown.dataset.owner === this.id) {
@@ -819,6 +858,14 @@ $('#toggler').on('click', function(){
     // Prevent Emmet from interfering in CSS/JS editors - use Tab for snippets or indentation
     cssEditor.addEventListener('keydown', function(e) {
         if (e.key === 'Tab') {
+            // Handle Shift+Tab for outdenting
+            if (e.shiftKey) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                removeTab(this);
+                return;
+            }
+            
             const dropdown = document.getElementById('autocomplete-dropdown');
             
             // If autocomplete dropdown is open, accept suggestion with Tab
@@ -847,6 +894,14 @@ $('#toggler').on('click', function(){
     
     javascriptEditor.addEventListener('keydown', function(e) {
         if (e.key === 'Tab') {
+            // Handle Shift+Tab for outdenting
+            if (e.shiftKey) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                removeTab(this);
+                return;
+            }
+            
             const dropdown = document.getElementById('autocomplete-dropdown');
             
             // If autocomplete dropdown is open, accept suggestion with Tab

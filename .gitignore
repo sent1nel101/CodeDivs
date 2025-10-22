@@ -4,6 +4,9 @@ WORKING.md
 SUMMARY.md
 AGENTS.md
 
+# Design backups
+*.backup.css
+
 # Node modules
 node_modules/
 
