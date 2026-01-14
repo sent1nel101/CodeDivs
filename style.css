@@ -153,22 +153,23 @@ body {
 }
 
 @media (max-width: 600px) {
-    #logo {
-        margin-right: 0;
-        gap: 0.75rem;
-        width: 100%;
-    }
+     #logo {
+         margin-right: 0;
+         gap: 0.75rem;
+         width: 100%;
+         justify-content: center;
+     }
 
-    #logo h1 {
-        border-right: none;
-        padding-right: 0;
-        font-size: var(--heading-h2);
-    }
+     #logo h1 {
+         border-right: none;
+         padding-right: 0;
+         font-size: 2.25rem;
+     }
 
-    #logo-sub {
-        display: none;
-    }
-}
+     #logo-sub {
+         display: none;
+     }
+ }
 
 #logo-me {
     font-size: 11px;
@@ -611,10 +612,11 @@ body {
 @media (max-width: 600px) {
     .contentWrapper {
         width: 100vw;
-        height: calc(100vh - 90px);
+        height: calc(100vh - 52px);
         padding-right: 0;
         gap: 0;
         flex-direction: column;
+        position: relative;
     }
 }
 
@@ -719,6 +721,17 @@ body {
     overflow: hidden;
 }
 
+/* On desktop, collapsed state just shrinks the width */
+@media (min-width: 601px) {
+    .file-explorer.collapsed {
+        width: 0;
+        min-width: 0;
+        display: flex;
+        border-right: none;
+        overflow: hidden;
+    }
+}
+
 @media (max-width: 600px) {
     .file-explorer {
         width: 100%;
@@ -727,12 +740,31 @@ body {
         border-right: none;
         border-bottom: 1px solid var(--border-medium);
         border-radius: 0;
-        max-height: 200px;
+        max-height: 250px;
         min-height: 120px;
+        position: absolute;
+        top: 52px;
+        left: 0;
+        z-index: 40;
+        margin: 0;
+        overflow-y: auto;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
     }
 
+    /* On mobile, collapsed state hides the file explorer */
     .file-explorer.collapsed {
+        width: 100%;
+        display: none;
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
         border-bottom: none;
+        border-right: none;
     }
 }
 
@@ -1350,6 +1382,177 @@ body {
 }
 
 /* ============================================
+   Phase 2.3: Navigation Drawer & Hamburger Menu
+   ============================================ */
+
+/* Hamburger menu toggle button */
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    transition: var(--transition-smooth);
+    z-index: 101;
+}
+
+.hamburger-menu span {
+    width: 24px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transition: var(--transition-smooth);
+    transform-origin: center;
+}
+
+.hamburger-menu.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile navigation drawer */
+.mobile-drawer {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 102;
+    animation: fadeIn 0.3s ease;
+}
+
+.mobile-drawer.show {
+    display: block;
+}
+
+.drawer-content {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-medium);
+    border-top: none;
+    border-radius: 0 0 0 12px;
+    min-width: 280px;
+    max-width: 100%;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn 0.3s ease;
+    overflow: hidden;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.drawer-section {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.drawer-section:last-child {
+    border-bottom: none;
+}
+
+.drawer-section-label {
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.drawer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    color: var(--text-primary);
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: var(--font-sm);
+    font-family: var(--font-system);
+    width: 100%;
+    text-align: left;
+    transition: var(--transition-smooth);
+    min-height: 44px;
+}
+
+.drawer-item:hover {
+    color: var(--accent-blue);
+}
+
+.drawer-item.theme-option {
+    padding-left: 24px;
+}
+
+/* Show hamburger on mobile */
+@media (max-width: 600px) {
+    .hamburger-menu {
+        display: flex;
+        order: -1;
+        margin-right: auto;
+    }
+    
+    /* Hide desktop-only buttons on mobile */
+    .desktop-only {
+        display: none !important;
+    }
+    
+    /* Show mobile-only elements */
+    #mobile-file-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 8px;
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        cursor: pointer;
+        border-radius: 6px;
+        transition: var(--transition-smooth);
+        margin-right: 0.5rem;
+        min-height: 44px;
+        min-width: 44px;
+        flex-shrink: 0;
+    }
+    
+    #mobile-file-toggle:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--accent-blue);
+    }
+    
+    #mobile-file-toggle:active {
+        opacity: 0.7;
+    }
+}
+
+/* ============================================
    Library Import Modal
    ============================================ */
 .modal {
@@ -1372,8 +1575,7 @@ body {
     padding: 0;
     border: 1px solid var(--border-medium);
     border-radius: 12px;
-    width: 90%;
-    max-width: 700px;
+    width: min(90vw, 700px);
     max-height: 80vh;
     overflow: hidden;
     box-shadow: var(--shadow-lg);
@@ -1381,20 +1583,46 @@ body {
     flex-direction: column;
 }
 
+@media (max-width: 600px) {
+    .modal-content {
+        width: min(90vw, 500px);
+        margin: 10% auto;
+        max-height: 85vh;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 414px) {
+    .modal-content {
+        width: min(95vw, 480px);
+        margin: 15% auto;
+    }
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 2rem;
+    padding: clamp(1rem, 3vw, 2rem);
     border-bottom: 1px solid var(--border-subtle);
     background: var(--bg-elevated);
 }
 
 .modal-header h2 {
     margin: 0;
-    font-size: 20px;
+    font-size: clamp(16px, 4vw, 20px);
     font-weight: 600;
     color: var(--text-primary);
+}
+
+@media (max-width: 600px) {
+    .modal-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
 }
 
 .close {
@@ -1411,9 +1639,15 @@ body {
 }
 
 .modal-body {
-    padding: 2rem;
+    padding: clamp(1rem, 3vw, 2rem);
     overflow-y: auto;
     flex: 1;
+}
+
+@media (max-width: 600px) {
+    .modal-body {
+        padding: 1rem 1.25rem;
+    }
 }
 
 .search-box {
@@ -1422,8 +1656,8 @@ body {
 
 .search-box input {
     width: 100%;
-    padding: 12px 16px;
-    font-size: 14px;
+    padding: clamp(10px, 2vw, 12px) clamp(12px, 2vw, 16px);
+    font-size: var(--font-sm);
     font-family: var(--font-system);
     background: var(--bg-secondary);
     color: var(--text-primary);
@@ -1431,6 +1665,7 @@ body {
     border-radius: 8px;
     outline: none;
     transition: var(--transition-smooth);
+    min-height: 44px;
 }
 
 .search-box input:focus {
@@ -1453,8 +1688,22 @@ body {
     gap: 1rem;
 }
 
+@media (max-width: 600px) {
+    .library-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 414px) {
+    .library-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+}
+
 .library-item {
-    padding: 1rem;
+    padding: clamp(0.75rem, 2vw, 1rem);
     background: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
     border-radius: 8px;
@@ -1463,6 +1712,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-height: 100px;
 }
 
 .library-item:hover {
@@ -1477,22 +1727,36 @@ body {
     background: rgba(0, 113, 227, 0.1);
 }
 
+@media (max-width: 600px) {
+    .library-item {
+        padding: 0.75rem;
+        min-height: 90px;
+    }
+}
+
+@media (max-width: 414px) {
+    .library-item {
+        min-height: 80px;
+    }
+}
+
 .library-name {
     font-weight: 600;
-    font-size: 14px;
+    font-size: clamp(12px, 2vw, 14px);
     color: var(--text-primary);
 }
 
 .library-desc {
-    font-size: 12px;
+    font-size: clamp(10px, 1.8vw, 12px);
     color: var(--text-secondary);
-    line-height: 1.4;
+    line-height: 1.3;
 }
 
 .library-version {
-    font-size: 11px;
+    font-size: clamp(9px, 1.5vw, 11px);
     color: var(--accent-blue);
     font-family: "SF Mono", monospace;
+    word-break: break-word;
 }
 
 /* Share Modal Specific Styles */
@@ -1500,6 +1764,13 @@ body {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    flex-direction: column;
+}
+
+@media (min-width: 600px) {
+    .share-url-container {
+        flex-direction: row;
+    }
 }
 
 .share-url-input {
@@ -1569,14 +1840,21 @@ body {
 
 .social-buttons {
     display: flex;
-    gap: 1rem;
+    gap: clamp(0.5rem, 2vw, 1rem);
+    flex-direction: column;
+}
+
+@media (min-width: 600px) {
+    .social-buttons {
+        flex-direction: row;
+    }
 }
 
 .social-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: clamp(10px, 1.5vw, 12px) clamp(16px, 2vw, 20px);
+    padding: clamp(10px, 2vw, 12px) clamp(16px, 2vw, 20px);
     font-size: var(--font-sm);
     font-weight: 500;
     color: white;
@@ -1586,11 +1864,18 @@ body {
     flex: 1;
     justify-content: center;
     min-height: 44px;
+    white-space: nowrap;
 }
 
 .social-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 600px) {
+    .social-btn {
+        padding: 12px 16px;
+    }
 }
 
 .social-btn.twitter {
@@ -1643,4 +1928,535 @@ body {
 #toggle-view-box,
 #toggler {
     will-change: transform;
+}
+
+/* ============================================
+   Phase 2.1: Touch Interaction Improvements
+   For devices without hover capability
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover states from dropdowns - they don't work on touch */
+    .export-dropdown:hover,
+    .social-btn:hover,
+    .copy-btn:hover,
+    .library-item:hover,
+    .theme-selector:hover,
+    .modal-content button:hover,
+    input:hover,
+    textarea:hover {
+        /* Override hover background/border changes */
+        background-color: inherit;
+        border-color: inherit;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Add active/tap states for touch feedback */
+    button,
+    .copy-btn,
+    .social-btn,
+    .library-item,
+    .theme-selector,
+    input,
+    textarea,
+    select {
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    /* Provide visible feedback on touch/tap */
+    button:active,
+    .copy-btn:active,
+    .social-btn:active,
+    .library-item:active,
+    .theme-selector:active,
+    input:active,
+    textarea:active,
+    select:active {
+        background: var(--bg-elevated);
+        opacity: 0.8;
+    }
+
+    /* Focus states are critical for touch interaction */
+    button:focus,
+    .copy-btn:focus,
+    .social-btn:focus,
+    .library-item:focus,
+    .theme-selector:focus,
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+    }
+
+    /* Remove transform hover effects on touch */
+    .copy-btn:hover,
+    .social-btn:hover,
+    .library-item:hover {
+        transform: none;
+    }
+
+    /* Touch-friendly export dropdown - no hover reveal */
+    .export-dropdown.dropdown-menu {
+        /* Always accessible, not hidden by default on hover */
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .export-dropdown.dropdown-menu.show {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Tab buttons get active state */
+    .tab:active {
+        background: rgba(0, 113, 227, 0.2);
+        border-color: var(--accent-blue);
+    }
+
+    .tab:focus {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: -2px;
+    }
+
+    /* Format button touch feedback */
+    .format-btn:active {
+        background: rgba(0, 113, 227, 0.15);
+    }
+
+    /* Output close button touch feedback */
+    .output-close-btn:active {
+        opacity: 0.7;
+    }
+
+    /* File explorer toggle touch feedback */
+    .explorer-toggle:active {
+        opacity: 0.8;
+    }
+
+    /* Autocomplete dropdown - ensure it's tappable */
+    #autocomplete-dropdown {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--border-medium);
+    }
+
+    #autocomplete-dropdown div:active {
+        background: var(--bg-elevated);
+    }
+
+    /* Modal interactions */
+    .modal-content button:focus-visible {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 2px;
+    }
+
+    /* Remove pointer cursors where not actionable */
+    .modal-header,
+    .library-desc,
+    .library-version {
+        cursor: auto;
+    }
+}
+
+/* ============================================
+   Focus Visible Improvements
+   Better keyboard and touch navigation
+   ============================================ */
+/* Only show focus outline for keyboard navigation, not mouse clicks */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.tab:focus-visible,
+.library-item:focus-visible,
+.copy-btn:focus-visible,
+.social-btn:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+/* Remove default focus styles on mouse click */
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* ============================================
+   High Contrast Mode Support
+   Better visibility on touch devices
+   ============================================ */
+@media (prefers-contrast: more) {
+    button,
+    .copy-btn,
+    .social-btn,
+    .tab {
+        border: 2px solid var(--border-medium);
+    }
+
+    button:active,
+    .copy-btn:active,
+    .social-btn:active,
+    .tab:active {
+        border-color: var(--accent-blue);
+    }
+}
+
+/* ============================================
+   Phase 2.4: Editor Controls Optimization
+   Format button, tabs, and output controls
+   ============================================ */
+
+/* Format Button Mobile Optimization */
+@media (max-width: 600px) {
+    .format-btn {
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 8px 12px;
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .format-btn span {
+        display: none;
+    }
+}
+
+/* Tab Bar Responsiveness */
+.tabs-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+}
+
+@media (max-width: 600px) {
+    .tabs-container {
+        min-height: 44px;
+        max-height: 44px;
+    }
+
+    .tab {
+        padding: 6px 10px;
+        gap: 4px;
+        min-width: 100px;
+    }
+
+    .tab-name {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tab-icon {
+        display: none;
+    }
+
+    .tab-close {
+        min-width: 20px;
+        min-height: 20px;
+    }
+}
+
+/* Output Container Mobile Optimization */
+#output-container {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 600px) {
+    #output-container {
+        min-height: 200px;
+        max-height: calc(100vh - 52px);
+    }
+}
+
+.output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(0.75rem, 2vw, 1rem);
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+    min-height: 44px;
+}
+
+.output-header h3 {
+    margin: 0;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.output-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: var(--transition-smooth);
+    font-size: 18px;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.output-close-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* File Explorer Toggle Mobile */
+.explorer-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: clamp(6px, 1.5vw, 10px) clamp(12px, 2vw, 16px);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: var(--font-sm);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    min-height: 44px;
+}
+
+.explorer-toggle:hover {
+    color: var(--text-primary);
+    border-color: var(--border-medium);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive Editor Container */
+.content-wrapper {
+    display: flex;
+    flex: 1;
+}
+
+@media (max-width: 600px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+}
+
+/* Editor Panels Mobile */
+.editor-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 200px;
+    position: relative;
+}
+
+@media (max-width: 600px) {
+    .editor-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border-medium);
+        max-height: 300px;
+    }
+
+    .editor-panel:last-child {
+        border-bottom: none;
+    }
+}
+
+/* ============================================
+   Phase 3: Advanced Optimizations
+   ============================================ */
+
+/* 3.2 Landscape Mode Handling */
+@media (max-height: 500px) and (orientation: landscape) {
+    /* Compact header for landscape */
+    .header {
+        min-height: auto;
+        padding: 0.5rem 0.75rem;
+        row-gap: 0.25rem;
+    }
+
+    /* Hide logo subtitle in landscape */
+    #logo-sub {
+        display: none !important;
+    }
+
+    /* Reduce icon and button sizing in landscape */
+    .hamburger-menu {
+        width: 40px;
+        height: 40px;
+    }
+
+    .theme-selector {
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+
+    .saveButton {
+        padding: 6px 12px;
+        font-size: 11px;
+        min-height: 36px;
+    }
+
+    /* Compact editor panels */
+    .editor-panel {
+        min-height: 150px;
+        max-height: 200px;
+    }
+
+    #output-container {
+        max-height: 200px;
+    }
+
+    /* Reduce tab height in landscape */
+    .tabs-container {
+        min-height: 36px;
+        max-height: 36px;
+    }
+
+    .tab {
+        padding: 4px 8px;
+        min-height: 36px;
+    }
+
+    /* Hide drawer on landscape (side-by-side is better) */
+    .mobile-drawer {
+        display: none !important;
+    }
+
+    .hamburger-menu {
+        display: none !important;
+    }
+}
+
+/* Very small landscape (max-height: 400px) */
+@media (max-height: 400px) {
+    .header {
+        min-height: auto;
+        padding: 0.5rem 0.5rem;
+    }
+
+    .logo h1 {
+        font-size: 14px;
+    }
+
+    .editor-panel {
+        min-height: 120px;
+    }
+
+    .tab {
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+}
+
+/* 3.3 Dark/Light Theme Mobile Optimization */
+[data-theme="light"] {
+    /* Increase contrast for light theme on small screens */
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+}
+
+@media (prefers-color-scheme: light) and (max-width: 600px) {
+    body {
+        /* Slightly darker background for readability on small displays */
+        --bg-primary: #f5f5f7;
+    }
+}
+
+/* Improve contrast for outdoor viewing */
+@media (prefers-contrast: more) {
+    .header {
+        border-bottom: 2px solid var(--border-medium);
+    }
+
+    .tab.active {
+        border-bottom: 3px solid var(--accent-blue);
+    }
+
+    .modal-content {
+        border: 2px solid var(--border-medium);
+    }
+}
+
+/* 3.4 Accessibility Improvements */
+
+/* Enhanced focus indicators */
+:focus-visible {
+    outline: 3px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+/* Reduced motion for users with vestibular disorders */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .hamburger-menu span {
+        transition: none;
+    }
+
+    .mobile-drawer {
+        animation: none !important;
+    }
+
+    .drawer-content {
+        animation: none !important;
+    }
+
+    #autocomplete-dropdown {
+        animation: none !important;
+    }
+}
+
+/* ARIA live regions for screen readers */
+[role="status"],
+[role="alert"],
+[aria-live],
+[aria-label] {
+    outline: none;
+}
+
+/* Better keyboard navigation for touch devices */
+@media (hover: none) and (pointer: coarse) {
+    /* Show keyboard indicator for non-mouse users */
+    :focus:not(:focus-visible) {
+        outline: none;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 1px;
+    }
+}
+
+/* Ensure sufficient color contrast */
+.text-primary {
+    color: var(--text-primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+/* Improve readability with line-height on mobile */
+@media (max-width: 600px) {
+    p,
+    .library-desc,
+    .modal-body {
+        line-height: 1.6;
+        letter-spacing: 0.3px;
+    }
 }

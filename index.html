@@ -31,6 +31,13 @@
 <body>
   <!-- START header with logo, toggler, and panel selectors -->
   <div class="header">
+    <!-- Hamburger menu (mobile only) -->
+    <button class="hamburger-menu" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
     <!-- START logo container -->
     <div id="logo">
       <h1>ÐεCødε</h1>
@@ -58,9 +65,10 @@
     </div>
     <!-- END toggler container -->
 
-    <a id="importLibrary" class="saveButton"
+    <!-- Desktop-only buttons (hidden on mobile) -->
+    <a id="importLibrary" class="saveButton desktop-only"
       style="margin-right: 0.5rem;">Import Library</a>
-    <div class="export-dropdown">
+    <div class="export-dropdown desktop-only">
       <button id="exportBtn" class="saveButton">Export ▾</button>
       <div id="exportMenu" class="export-menu">
         <a href="#" id="export-codepen">CodePen</a>
@@ -68,12 +76,42 @@
         <a href="#" id="export-jsbin">JSBin</a>
       </div>
     </div>
-    <a id="shareBtn" class="saveButton" style="margin-right: 0.5rem;">Share</a>
-    <a id="saveToFile" class="saveButton">Save</a>
+    <a id="shareBtn" class="saveButton desktop-only" style="margin-right: 0.5rem;">Share</a>
+    <a id="saveToFile" class="saveButton desktop-only">Save</a>
+    
+    <!-- Mobile file explorer toggle -->
+    <button id="mobile-file-toggle" class="mobile-only" title="Toggle file explorer"
+      aria-label="Toggle file explorer" style="display: none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      </svg>
+    </button>
+    
     <span id="logo-me">&copy; 2021 | D. McDaniel</span>
   </div>
   <!-- END selector container -->
   <!-- END header and brand section -->
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-drawer">
+    <div class="drawer-content">
+      <div class="drawer-section">
+        <div class="drawer-section-label">Display</div>
+        <button class="drawer-item theme-option" data-theme="auto">Auto Theme</button>
+        <button class="drawer-item theme-option" data-theme="dark">Dark Theme</button>
+        <button class="drawer-item theme-option" data-theme="light">Light Theme</button>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-label">Actions</div>
+        <a id="mobile-import" class="drawer-item" style="text-decoration: none;">📚 Import Library</a>
+        <a id="mobile-export" class="drawer-item" style="text-decoration: none;">💾 Export</a>
+        <a id="mobile-share" class="drawer-item" style="text-decoration: none;">🔗 Share</a>
+        <a id="mobile-save" class="drawer-item" style="text-decoration: none;">⬇️ Save to File</a>
+      </div>
+    </div>
+  </div>
+  <!-- END Mobile Navigation Drawer -->
 
   <!-- Library Import Modal -->
   <div id="library-modal" class="modal">

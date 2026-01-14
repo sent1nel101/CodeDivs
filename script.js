@@ -2085,5 +2085,110 @@ $('#toggler').on('click', function(){
         });
     });
 
+    // Phase 2.3: Mobile Hamburger Menu & File Toggle
+    $(function() {
+        // Initialize hamburger menu and drawer on mobile
+        function initHamburgerMenu() {
+            const hamburger = document.querySelector('.hamburger-menu');
+            const drawer = document.querySelector('.mobile-drawer');
+            
+            if (!hamburger || !drawer) return;
+            
+            // Toggle drawer on hamburger click
+            hamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                drawer.classList.toggle('show');
+            });
+            
+            // Handle drawer item clicks for theme selection
+            const themeOptions = document.querySelectorAll('.drawer-item.theme-option');
+            themeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const theme = option.dataset.theme;
+                    const selector = document.getElementById('theme-selector');
+                    if (selector) {
+                        selector.value = theme;
+                        selector.dispatchEvent(new Event('change'));
+                    }
+                    hamburger.classList.remove('active');
+                    drawer.classList.remove('show');
+                });
+            });
+            
+            // Handle mobile action button clicks
+            const mobileImport = document.getElementById('mobile-import');
+            if (mobileImport) {
+                mobileImport.addEventListener('click', () => {
+                    document.getElementById('importLibrary').click();
+                    hamburger.classList.remove('active');
+                    drawer.classList.remove('show');
+                });
+            }
+            
+            const mobileExport = document.getElementById('mobile-export');
+            if (mobileExport) {
+                mobileExport.addEventListener('click', () => {
+                    document.getElementById('exportBtn').click();
+                    hamburger.classList.remove('active');
+                    drawer.classList.remove('show');
+                });
+            }
+            
+            const mobileShare = document.getElementById('mobile-share');
+            if (mobileShare) {
+                mobileShare.addEventListener('click', () => {
+                    document.getElementById('shareBtn').click();
+                    hamburger.classList.remove('active');
+                    drawer.classList.remove('show');
+                });
+            }
+            
+            const mobileSave = document.getElementById('mobile-save');
+            if (mobileSave) {
+                mobileSave.addEventListener('click', () => {
+                    document.getElementById('saveToFile').click();
+                    hamburger.classList.remove('active');
+                    drawer.classList.remove('show');
+                });
+            }
+            
+            // Mobile file explorer toggle (use same 'collapsed' class as desktop toggle)
+            const mobileFileToggle = document.getElementById('mobile-file-toggle');
+            const fileExplorer = document.getElementById('file-explorer');
+            if (mobileFileToggle && fileExplorer) {
+                // Initialize collapsed on mobile (hide by default)
+                if (window.innerWidth <= 600) {
+                    fileExplorer.classList.add('collapsed');
+                }
+                
+                // Toggle on click
+                mobileFileToggle.addEventListener('click', () => {
+                    fileExplorer.classList.toggle('collapsed');
+                    const isCollapsed = fileExplorer.classList.contains('collapsed');
+                    mobileFileToggle.setAttribute('aria-pressed', !isCollapsed ? 'true' : 'false');
+                });
+            }
+            
+            // Close drawer when clicking overlay
+            drawer.addEventListener('click', (e) => {
+                if (e.target === drawer) {
+                    hamburger.classList.remove('active');
+                    drawer.classList.remove('show');
+                }
+            });
+            
+            // Close drawer on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && drawer.classList.contains('show')) {
+                    hamburger.classList.remove('active');
+                    drawer.classList.remove('show');
+                }
+            });
+        }
+        
+        initHamburgerMenu();
+    });
 
-})
+
+    })
