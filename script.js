@@ -1454,6 +1454,14 @@ $('#toggler').on('click', function(){
         openTabs: [],
         activeTab: null,
         popoutWindow: null,
+        
+        // Split-view properties
+        splitMode: false,
+        splitOrientation: 'horizontal', // 'horizontal' or 'vertical'
+        activeTab1: null,
+        activeTab2: null,
+        panelWidths: { panel1: 50, panel2: 50 }, // percentages for horizontal
+        panelHeights: { panel1: 50, panel2: 50 }, // percentages for vertical
 
         init() {
             // Start with editor disabled
@@ -1461,6 +1469,7 @@ $('#toggler').on('click', function(){
 
             this.loadFromStorage();
             this.loadTabsFromStorage();
+            this.loadSplitViewState();
             this.setupEventListeners();
             this.renderFileTree();
 
@@ -1611,19 +1620,105 @@ $('#toggler').on('click', function(){
             this.saveTabsToStorage();
         },
 
-        switchToTab(fileId) {
+        switchToTab(fileId, targetPanel = 1) {
             if (!this.files[fileId]) return;
 
-            // Save current tab content
-            if (this.activeTab && this.activeTab !== fileId) {
-                this.saveCurrentContent();
+            if (this.splitMode) {
+                // In split mode, switch specific panel
+                this.switchToTabInPanel(fileId, targetPanel);
+            } else {
+                // Normal single-panel mode
+                // Save current tab content
+                if (this.activeTab && this.activeTab !== fileId) {
+                    this.saveCurrentContent();
+                }
+
+                this.activeTab = fileId;
+                this.loadFileContent(fileId);
+                this.renderTabs();
+                this.renderFileTree();
+                this.saveTabsToStorage();
+            }
+        },
+
+        switchToTabInPanel(fileId, panelNumber = 1) {
+            if (!this.files[fileId]) return;
+
+            if (panelNumber === 2) {
+                if (this.activeTab2 && this.activeTab2 !== fileId) {
+                    this.saveCurrentContent2();
+                }
+                this.activeTab2 = fileId;
+                this.loadFileContentInPanel(fileId, 2);
+            } else {
+                if (this.activeTab1 && this.activeTab1 !== fileId) {
+                    this.saveCurrentContent();
+                }
+                this.activeTab1 = fileId;
+                this.loadFileContentInPanel(fileId, 1);
             }
 
-            this.activeTab = fileId;
-            this.loadFileContent(fileId);
             this.renderTabs();
             this.renderFileTree();
             this.saveTabsToStorage();
+        },
+
+        toggleSplitView() {
+            this.splitMode = !this.splitMode;
+
+            if (this.splitMode) {
+                // Enable split view
+                const panel2 = document.getElementById('editor-panel-2');
+                const wrapper = document.getElementById('editor-panels-wrapper');
+                const divider = document.getElementById('editor-divider');
+
+                panel2.style.display = 'flex';
+                wrapper.classList.add('split-' + this.splitOrientation);
+                divider.style.display = 'block';
+
+                // Set up second panel with a different tab if available
+                if (this.openTabs.length > 1) {
+                    this.activeTab2 = this.openTabs[1];
+                    this.loadFileContentInPanel(this.openTabs[1], 2);
+                } else if (this.openTabs.length === 1) {
+                    this.activeTab2 = this.openTabs[0];
+                    this.loadFileContentInPanel(this.openTabs[0], 2);
+                }
+
+                // Store active tabs from single mode
+                this.activeTab1 = this.activeTab;
+
+                // Update button state
+                const toggleBtn = document.getElementById('split-toggle-btn');
+                if (toggleBtn) {
+                    toggleBtn.classList.add('active');
+                }
+            } else {
+                // Disable split view
+                const panel2 = document.getElementById('editor-panel-2');
+                const wrapper = document.getElementById('editor-panels-wrapper');
+                const divider = document.getElementById('editor-divider');
+
+                panel2.style.display = 'none';
+                wrapper.classList.remove('split-horizontal', 'split-vertical');
+                divider.style.display = 'none';
+
+                // Return to single-panel mode with first tab
+                this.activeTab = this.activeTab1 || this.openTabs[0];
+                if (this.activeTab) {
+                    this.loadFileContent(this.activeTab);
+                }
+
+                // Update button state
+                const toggleBtn = document.getElementById('split-toggle-btn');
+                if (toggleBtn) {
+                    toggleBtn.classList.remove('active');
+                }
+            }
+
+            this.renderTabs();
+            this.renderFileTree();
+            this.saveSplitViewState();
         },
 
         loadFileContent(fileId) {
@@ -1631,6 +1726,20 @@ $('#toggler').on('click', function(){
             if (!file) return;
 
             const editor = document.getElementById('unified-editor');
+            editor.value = file.content || '';
+            editor.disabled = false;
+
+            this.updateOutput();
+        },
+
+        loadFileContentInPanel(fileId, panelNumber = 1) {
+            const file = this.files[fileId];
+            if (!file) return;
+
+            const editorId = panelNumber === 2 ? 'unified-editor-2' : 'unified-editor';
+            const editor = document.getElementById(editorId);
+            if (!editor) return;
+
             editor.value = file.content || '';
             editor.disabled = false;
 
@@ -1647,6 +1756,49 @@ $('#toggler').on('click', function(){
             file.content = editor.value;
 
             this.saveToStorage();
+        },
+
+        saveCurrentContent2() {
+            if (!this.activeTab2) return;
+
+            const file = this.files[this.activeTab2];
+            if (!file) return;
+
+            const editor = document.getElementById('unified-editor-2');
+            if (!editor) return;
+
+            file.content = editor.value;
+
+            this.saveToStorage();
+        },
+
+        saveSplitViewState() {
+            const splitViewState = {
+                splitMode: this.splitMode,
+                splitOrientation: this.splitOrientation,
+                activeTab1: this.activeTab1,
+                activeTab2: this.activeTab2,
+                panelWidths: this.panelWidths,
+                panelHeights: this.panelHeights
+            };
+            localStorage.setItem('codedivs_split_view', JSON.stringify(splitViewState));
+        },
+
+        loadSplitViewState() {
+            const saved = localStorage.getItem('codedivs_split_view');
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    this.splitMode = state.splitMode || false;
+                    this.splitOrientation = state.splitOrientation || 'horizontal';
+                    this.activeTab1 = state.activeTab1 || null;
+                    this.activeTab2 = state.activeTab2 || null;
+                    this.panelWidths = state.panelWidths || { panel1: 50, panel2: 50 };
+                    this.panelHeights = state.panelHeights || { panel1: 50, panel2: 50 };
+                } catch (e) {
+                    console.error('Failed to load split view state:', e);
+                }
+            }
         },
 
         disableEditor() {
@@ -1971,6 +2123,14 @@ $('#toggler').on('click', function(){
                 fileToggleBtn.addEventListener('click', () => {
                     const explorer = document.getElementById('file-explorer');
                     explorer.classList.toggle('collapsed');
+                });
+            }
+
+            // Split toggle button
+            const splitToggleBtn = document.getElementById('split-toggle-btn');
+            if (splitToggleBtn) {
+                splitToggleBtn.addEventListener('click', () => {
+                    this.toggleSplitView();
                 });
             }
 
