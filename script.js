@@ -1693,6 +1693,9 @@ $('#toggler').on('click', function(){
                 if (toggleBtn) {
                     toggleBtn.classList.add('active');
                 }
+
+                // Apply saved panel sizes
+                this.applyPanelSizes();
             } else {
                 // Disable split view
                 const panel2 = document.getElementById('editor-panel-2');
@@ -1719,6 +1722,99 @@ $('#toggler').on('click', function(){
             this.renderTabs();
             this.renderFileTree();
             this.saveSplitViewState();
+        },
+
+        setupResizableDivider() {
+            const divider = document.getElementById('editor-divider');
+            const wrapper = document.getElementById('editor-panels-wrapper');
+            const panel1 = document.getElementById('editor-panel-1');
+            const panel2 = document.getElementById('editor-panel-2');
+
+            if (!divider || !panel1 || !panel2) return;
+
+            let isResizing = false;
+            let startX = 0;
+            let startY = 0;
+            let startWidth1 = 0;
+            let startHeight1 = 0;
+
+            divider.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+
+                // Get initial sizes
+                startWidth1 = panel1.offsetWidth;
+                startHeight1 = panel1.offsetHeight;
+
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+                e.preventDefault();
+            });
+
+            const handleMouseMove = (e) => {
+                if (!isResizing) return;
+
+                if (this.splitOrientation === 'horizontal') {
+                    // Horizontal split (side-by-side)
+                    const deltaX = e.clientX - startX;
+                    const totalWidth = wrapper.offsetWidth;
+                    const newWidth1 = startWidth1 + deltaX;
+                    const percentage1 = (newWidth1 / totalWidth) * 100;
+
+                    // Clamp between 20% and 80%
+                    const clampedPercentage = Math.max(20, Math.min(80, percentage1));
+
+                    panel1.style.width = clampedPercentage + '%';
+                    panel2.style.width = (100 - clampedPercentage) + '%';
+
+                    // Update state
+                    this.panelWidths = {
+                        panel1: clampedPercentage,
+                        panel2: 100 - clampedPercentage
+                    };
+                } else {
+                    // Vertical split (stacked)
+                    const deltaY = e.clientY - startY;
+                    const totalHeight = wrapper.offsetHeight;
+                    const newHeight1 = startHeight1 + deltaY;
+                    const percentage1 = (newHeight1 / totalHeight) * 100;
+
+                    // Clamp between 20% and 80%
+                    const clampedPercentage = Math.max(20, Math.min(80, percentage1));
+
+                    panel1.style.height = clampedPercentage + '%';
+                    panel2.style.height = (100 - clampedPercentage) + '%';
+
+                    // Update state
+                    this.panelHeights = {
+                        panel1: clampedPercentage,
+                        panel2: 100 - clampedPercentage
+                    };
+                }
+            };
+
+            const handleMouseUp = () => {
+                isResizing = false;
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+                this.saveSplitViewState();
+            };
+        },
+
+        applyPanelSizes() {
+            const panel1 = document.getElementById('editor-panel-1');
+            const panel2 = document.getElementById('editor-panel-2');
+
+            if (!panel1 || !panel2) return;
+
+            if (this.splitOrientation === 'horizontal') {
+                panel1.style.width = this.panelWidths.panel1 + '%';
+                panel2.style.width = this.panelWidths.panel2 + '%';
+            } else {
+                panel1.style.height = this.panelHeights.panel1 + '%';
+                panel2.style.height = this.panelHeights.panel2 + '%';
+            }
         },
 
         loadFileContent(fileId) {
@@ -2171,6 +2267,9 @@ $('#toggler').on('click', function(){
                     this.toggleSplitView();
                 });
             }
+
+            // Resizable divider for split panels
+            this.setupResizableDivider();
 
             // Pop-out output button
             const popoutBtn = document.getElementById('popout-output-btn');

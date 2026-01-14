@@ -750,9 +750,25 @@ body {
     grid-template-columns: 1fr auto 1fr;
 }
 
+.editor-panels-wrapper.split-horizontal #editor-panel-1 {
+    width: 50%;
+}
+
+.editor-panels-wrapper.split-horizontal #editor-panel-2 {
+    width: 50%;
+}
+
 .editor-panels-wrapper.split-vertical {
     grid-template-rows: 1fr auto 1fr;
     grid-template-columns: 1fr;
+}
+
+.editor-panels-wrapper.split-vertical #editor-panel-1 {
+    height: 50%;
+}
+
+.editor-panels-wrapper.split-vertical #editor-panel-2 {
+    height: 50%;
 }
 
 /* Editor Panel */
