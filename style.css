@@ -20,6 +20,20 @@
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display",
     "Segoe UI", Roboto, sans-serif;
+
+  /* Fluid Typography Scale */
+  /* Mobile (320px): base 12px, h1 16px */
+  /* Tablet (600px): base 13px, h1 18px */
+  /* Desktop (1024px+): base 14px, h1 21px */
+  --font-base: clamp(12px, 2.2vw, 14px);
+  --font-sm: clamp(11px, 2vw, 13px);
+  --font-lg: clamp(14px, 2.5vw, 16px);
+  --font-xl: clamp(16px, 3vw, 18px);
+  --font-2xl: clamp(18px, 3.5vw, 20px);
+  --font-3xl: clamp(20px, 4vw, 21px);
+  --heading-h1: clamp(16px, 4.5vw, 21px);
+  --heading-h2: clamp(18px, 3.5vw, 20px);
+  --heading-h3: clamp(16px, 3vw, 18px);
 }
 
 /* Light Theme Variables */
@@ -51,8 +65,10 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
-  padding: 0 2rem 2rem;
+  padding: 0 clamp(0.75rem, 2vw, 2rem) clamp(0.75rem, 2vw, 2rem);
   box-sizing: border-box;
+  font-size: var(--font-base);
+  line-height: 1.5;
 }
 
 /* ============================================
@@ -66,8 +82,8 @@ body {
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0 2rem;
-  height: 52px;
+  padding: 0 clamp(0.75rem, 2vw, 2rem);
+  height: clamp(48px, 12vw, 52px);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -86,22 +102,24 @@ body {
 }
 
 #logo h1 {
-  font-size: 21px;
+  font-size: var(--heading-h1);
   font-weight: 600;
   letter-spacing: -0.5px;
   color: var(--text-primary);
   margin: 0;
   padding-right: 1rem;
   border-right: 1px solid var(--border-subtle);
+  line-height: 1.2;
 }
 
 #logo-sub {
-  font-size: 12px;
+  font-size: var(--font-sm);
   font-weight: 500;
   color: var(--text-secondary);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   padding-left: 0.25rem;
+  line-height: 1.2;
 }
 
 #logo-me {
@@ -116,7 +134,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 13px;
+  font-size: var(--font-sm);
   font-weight: 500;
   color: var(--text-secondary);
   text-transform: capitalize;
@@ -124,8 +142,8 @@ body {
 }
 
 .theme-selector {
-  padding: 4px 12px;
-  font-size: 13px;
+  padding: 6px 12px;
+  font-size: var(--font-sm);
   font-weight: 500;
   font-family: var(--font-system);
   background: var(--bg-elevated);
@@ -158,7 +176,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 13px;
+  font-size: var(--font-sm);
   font-weight: 500;
   color: var(--text-secondary);
   text-transform: capitalize;
@@ -205,8 +223,8 @@ body {
 }
 
 .toggleButton {
-  padding: 6px 16px;
-  font-size: 13px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2vw, 16px);
+  font-size: var(--font-sm);
   font-weight: 500;
   background: transparent;
   color: var(--text-secondary);
@@ -216,6 +234,10 @@ body {
   transition: var(--transition-smooth);
   white-space: nowrap;
   user-select: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .toggleButton:hover {
@@ -231,8 +253,8 @@ body {
 
 /* Save Button */
 .saveButton {
-  padding: 6px 16px;
-  font-size: 13px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2vw, 16px);
+  font-size: var(--font-sm);
   font-weight: 500;
   background: var(--bg-elevated);
   color: var(--text-primary);
@@ -244,6 +266,9 @@ body {
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .saveButton:hover {
@@ -265,8 +290,8 @@ body {
   justify-content: space-between;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0 1rem;
-  height: 42px;
+  padding: 0 clamp(0.75rem, 1vw, 1rem);
+  height: clamp(40px, 10vw, 42px);
   gap: 1rem;
   overflow-x: auto;
   overflow-y: hidden;
@@ -285,6 +310,7 @@ body {
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: center;
 }
 
 .tabs-container::-webkit-scrollbar {
@@ -303,9 +329,10 @@ body {
 .tab {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
-  font-size: 13px;
+  padding: clamp(6px, 1vw, 8px) clamp(12px, 1.5vw, 16px);
+  font-size: var(--font-sm);
   font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
@@ -316,6 +343,7 @@ body {
   white-space: nowrap;
   position: relative;
   user-select: none;
+  min-height: 44px;
 }
 
 .tab:hover {
@@ -364,9 +392,10 @@ body {
 .popout-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(10px, 1.5vw, 12px);
+  font-size: var(--font-sm);
   font-weight: 500;
   font-family: var(--font-system);
   background: var(--bg-elevated);
@@ -376,6 +405,8 @@ body {
   cursor: pointer;
   transition: var(--transition-smooth);
   white-space: nowrap;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .popout-btn:hover {
@@ -393,8 +424,8 @@ body {
 
 /* Make export button match saveButton style */
 #exportBtn {
-  padding: 6px 16px;
-  font-size: 13px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2vw, 16px);
+  font-size: var(--font-sm);
   font-weight: 500;
   background: var(--bg-elevated);
   color: var(--text-primary);
@@ -406,6 +437,9 @@ body {
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 #exportBtn:hover {
@@ -764,14 +798,15 @@ body {
 /* Format Button */
 .format-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: clamp(6px, 1vw, 8px);
+  right: clamp(6px, 1vw, 8px);
   z-index: 10;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(10px, 1.5vw, 12px);
+  font-size: var(--font-sm);
   font-weight: 500;
   font-family: var(--font-system);
   background: var(--bg-elevated);
@@ -782,6 +817,8 @@ body {
   transition: var(--transition-smooth);
   outline: none;
   opacity: 0.7;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .format-btn:hover {
@@ -1308,22 +1345,24 @@ body {
 
 .share-url-input {
   flex: 1;
-  padding: 12px 16px;
-  font-size: 13px;
+  padding: clamp(10px, 1.5vw, 12px) clamp(12px, 2vw, 16px);
+  font-size: var(--font-sm);
   font-family: "SF Mono", monospace;
   background: var(--bg-secondary);
   color: var(--text-primary);
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   outline: none;
+  min-height: 44px;
 }
 
 .copy-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 12px 20px;
-  font-size: 13px;
+  padding: clamp(10px, 1.5vw, 12px) clamp(16px, 2vw, 20px);
+  font-size: var(--font-sm);
   font-weight: 500;
   font-family: var(--font-system);
   background: var(--accent-blue);
@@ -1333,6 +1372,8 @@ body {
   cursor: pointer;
   transition: var(--transition-smooth);
   white-space: nowrap;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .copy-btn:hover {
@@ -1376,8 +1417,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  font-size: 13px;
+  padding: clamp(10px, 1.5vw, 12px) clamp(16px, 2vw, 20px);
+  font-size: var(--font-sm);
   font-weight: 500;
   color: white;
   text-decoration: none;
@@ -1385,6 +1426,7 @@ body {
   transition: var(--transition-smooth);
   flex: 1;
   justify-content: center;
+  min-height: 44px;
 }
 
 .social-btn:hover {
