@@ -33,10 +33,21 @@
   <div class="header">
     <!-- START logo container -->
     <div id="logo">
-      <h1>CodeDivs</h1>
+      <h1>ÐεCødε</h1>
       <span id="logo-sub"> &lt;&gt;Coding-SandBox&lt;/&gt;</span>
     </div>
     <!-- END logo container -->
+
+    <!-- START theme switcher -->
+    <div class="themeWrapper">
+      <span style="font-variant: small-caps">theme</span>
+      <select id="theme-selector" class="theme-selector">
+        <option value="auto">Auto</option>
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+      </select>
+    </div>
+    <!-- END theme switcher -->
 
     <!-- START toggler container: toggle panels vertically or horizontally-->
     <div class="toggleWrapper">
@@ -47,29 +58,200 @@
     </div>
     <!-- END toggler container -->
 
-    <!-- START selector buttons container -->
-    <div class="buttonContainer">
-      <div class="toggleButton selected" id="htmlBtn">HTML</div>
-      <div class="toggleButton selected" id="cssBtn">CSS</div>
-      <div class="toggleButton" id="javascriptBtn">JavaScript</div>
-      <div class="toggleButton selected" id="outputBtn">Output</div>
+    <a id="importLibrary" class="saveButton"
+      style="margin-right: 0.5rem;">Import Library</a>
+    <div class="export-dropdown">
+      <button id="exportBtn" class="saveButton">Export ▾</button>
+      <div id="exportMenu" class="export-menu">
+        <a href="#" id="export-codepen">CodePen</a>
+        <a href="#" id="export-jsfiddle">JSFiddle</a>
+        <a href="#" id="export-jsbin">JSBin</a>
+      </div>
     </div>
-
+    <a id="shareBtn" class="saveButton" style="margin-right: 0.5rem;">Share</a>
     <a id="saveToFile" class="saveButton">Save</a>
     <span id="logo-me">&copy; 2021 | D. McDaniel</span>
   </div>
   <!-- END selector container -->
   <!-- END header and brand section -->
 
+  <!-- Library Import Modal -->
+  <div id="library-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Import Library</h2>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="search-box">
+          <input type="text" id="library-search"
+            placeholder="Search libraries..." />
+        </div>
+        <div class="library-categories">
+          <h3>Popular Libraries</h3>
+          <div class="library-grid" id="library-list">
+            <!-- Libraries will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div id="share-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Share Your Code</h2>
+        <span class="close-share">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p
+          style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 14px;">
+          Copy the link below to share your code with others:
+        </p>
+        <div class="share-url-container">
+          <input type="text" id="share-url" readonly class="share-url-input" />
+          <button id="copy-url-btn" class="copy-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path
+                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1">
+              </path>
+            </svg>
+            Copy
+          </button>
+        </div>
+        <div id="copy-success" class="copy-success">✓ Link copied to clipboard!
+        </div>
+        <div class="share-social">
+          <h3
+            style="font-size: 14px; color: var(--text-secondary); margin: 1.5rem 0 1rem;">
+            Share on social media:</h3>
+          <div class="social-buttons">
+            <a href="#" id="share-twitter" class="social-btn twitter"
+              target="_blank">
+              <svg width="18" height="18" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                  d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z">
+                </path>
+              </svg>
+              Twitter
+            </a>
+            <a href="#" id="share-linkedin" class="social-btn linkedin"
+              target="_blank">
+              <svg width="18" height="18" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                  d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z">
+                </path>
+                <circle cx="4" cy="4" r="2"></circle>
+              </svg>
+              LinkedIn
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar" id="tab-bar">
+    <div class="tabs-container" id="tabs-container">
+      <!-- Tabs will be populated by JavaScript -->
+    </div>
+    <div class="tab-bar-actions">
+      <button id="toggle-output-btn" class="popout-btn"
+        title="Toggle Output Panel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="9" y1="3" x2="9" y2="21"></line>
+        </svg>
+        Toggle Output
+      </button>
+      <button id="popout-output-btn" class="popout-btn"
+        title="Pop-out Output Window">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6">
+          </path>
+          <path d="M21 3l-9 9"></path>
+          <path d="M15 3h6v6"></path>
+        </svg>
+        Pop-out Output
+      </button>
+    </div>
+  </div>
+
   <!-- START content section: textareas and view panel -->
   <div class="contentWrapper">
-    <div class="html"><textarea id="html-text-area" class="text-area"
-        style="color: #f0f0f0">&lt;p&gt;Hello World!&lt;/p&gt;</textarea></div>
-    <div class="css"><textarea id="css-text-area"
-        class="text-area">html{padding: 1rem}</textarea></div>
-    <div class="javascript hidden"><textarea id="javascript-text-area"
-        class="text-area">// enter your JS code here =)</textarea></div>
-    <iframe class="output" id="output-text"></iframe>
+    <!-- File Explorer Sidebar -->
+    <div class="file-explorer" id="file-explorer">
+      <div class="file-explorer-header">
+        <h3>Files</h3>
+        <button id="toggle-explorer" class="explorer-toggle"
+          title="Toggle File Explorer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="file-actions">
+        <button id="new-file-btn" class="file-action-btn" title="New File">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z">
+            </path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          New File
+        </button>
+        <button id="new-folder-btn" class="file-action-btn" title="New Folder">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path
+              d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+            </path>
+          </svg>
+          New Folder
+        </button>
+      </div>
+      <div class="file-tree" id="file-tree">
+        <!-- File tree will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Unified Editor Area -->
+    <div class="editor-container" id="editor-container">
+      <button class="format-btn" id="format-current"
+        title="Format Code (Ctrl+Shift+F)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+        Format
+      </button>
+      <textarea id="unified-editor" class="text-area"></textarea>
+    </div>
+
+    <!-- Output Panel -->
+    <div class="output-container" id="output-container">
+      <div class="output-header">
+        <span>Output</span>
+        <button id="close-output-btn" class="output-close-btn"
+          title="Hide Output">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <iframe class="output" id="output-text"></iframe>
+    </div>
   </div>
   <!-- END content section -->
 

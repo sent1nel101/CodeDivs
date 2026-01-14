@@ -19,11 +19,19 @@
 ### Enhanced Code Editing
 - ✨ **Emmet Abbreviation Support** (HTML only)
 - 🎯 **Smart Autocomplete** with language-specific suggestions
-- 💡 **150+ Code Snippets** with Tab expansion
+- 💡 **210+ Code Snippets** with Tab expansion
 - ⏮️ **Undo/Redo** with Ctrl+Z / Ctrl+Y
 - 🔍 **Bracket Matching** with visual highlight
 - 📝 **Auto-Close Brackets** for `()`, `[]`, `{}`
-- 🌈 **Dark Theme** optimized for readability
+- 🎨 **Theme Switcher**: Light, Dark, and Auto modes
+- ✨ **Code Formatter**: Beautify HTML, CSS, and JS with one click
+
+### New Productivity Features
+- 📁 **Virtual File System**: Create, manage, and organize multiple files with a built-in file explorer
+- 📦 **Library Import**: Quick-add popular libraries (Bootstrap, React, Vue, etc.)
+- 🔗 **Export to Platforms**: One-click export to CodePen, JSFiddle, or JSBin
+- 🌐 **URL Sharing**: Share your code via shareable links with social media integration
+- 📱 **Fully Responsive**: Optimized for desktop, tablet, and mobile devices
 
 ## 🎯 Getting Started
 
@@ -45,10 +53,12 @@
 | `Ctrl + Z` | Undo |
 | `Ctrl + Y` | Redo |
 | `Ctrl + Shift + Z` | Redo (alternative) |
+| `Ctrl + Shift + F` | Format code (HTML, CSS, or JS) |
 | `Tab` (HTML) | Expand Emmet abbreviation or snippet |
 | `Tab` (CSS/JS) | Expand snippet or indent |
+| `Shift + Tab` | Outdent (remove indentation) |
 | `Enter` | Accept autocomplete suggestion |
-| `Esc` | Close autocomplete dropdown |
+| `Esc` | Close autocomplete dropdown or modals |
 
 ## 💎 Code Snippets Reference
 
@@ -268,6 +278,54 @@ Expands to:
 - Automatically adds closing bracket when opening bracket is typed
 - Works for `()`, `[]`, `{}` in all editors
 - Cursor positioned between brackets for immediate editing
+
+### Theme Switcher
+- **Dark Mode**: Apple-inspired dark theme optimized for low-light coding
+- **Light Mode**: Clean, professional light theme for bright environments
+- **Auto Mode**: Automatically matches your system preferences
+- Theme preference saved in localStorage
+
+### Code Formatter
+- One-click code beautification for HTML, CSS, and JavaScript
+- Intelligent indentation and line breaks
+- Preserves code functionality while improving readability
+- Keyboard shortcut: `Ctrl + Shift + F`
+
+### Library Import System
+- Quick-add popular libraries with one click
+- Includes:
+  - CSS Frameworks: Bootstrap, Tailwind CSS, Animate.css
+  - JavaScript Libraries: React, Vue.js, Alpine.js, jQuery
+  - Utilities: Axios, Lodash, Chart.js, GSAP, Three.js
+  - Icons: Font Awesome
+- Search functionality to find libraries quickly
+- Automatically inserts CDN links in proper locations
+
+### Export to Platforms
+- **CodePen**: Export with title and description
+- **JSFiddle**: Direct export to JSFiddle editor
+- **JSBin**: Open in JSBin with all panels populated
+- One-click workflow for sharing on popular platforms
+
+### URL-Based Sharing
+- Generate shareable links with your code embedded
+- Code compressed and encoded in URL hash
+- Share via Twitter, LinkedIn, or direct link
+- Copy link to clipboard with one click
+- Load shared code automatically from URL
+- No backend required - all client-side
+
+### Virtual File System
+- **File Explorer Sidebar**: Visual file tree with easy navigation
+- **Multi-file Support**: Create and manage multiple HTML, CSS, and JS files
+- **File Operations**:
+  - Create new files with automatic type detection
+  - Delete files with confirmation
+  - Switch between files seamlessly
+- **Auto-save**: Changes automatically saved to localStorage
+- **Persistent Storage**: All files preserved between sessions
+- **Collapsible Interface**: Hide/show file explorer to maximize workspace
+- **Mobile-Friendly**: Responsive file explorer for mobile devices
 
 ## 📱 Browser Compatibility
 

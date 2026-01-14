@@ -770,210 +770,1306 @@ $('#toggler').on('click', function(){
         $('.output').toggleClass('hidden')
     })
 
-// run updateContent() when values in the input areas change
-    $("#html-text-area").on('change keyup paste', function(){
-        updateContent()                
-    })
-
-    $("#css-text-area").on('change keyup paste', function(){
-        updateContent()                
-    })
-
-    $("#javascript-text-area").on('change keyup paste', function(){
-        updateContent()                
-    })
-
-//create updateContent() to change the content of the iframe with input values 
-    function updateContent(){
-    $('iframe').contents().find("html").html('<style type="text/css" >' + $('#css-text-area').val() + '</style>' + $('#html-text-area').val());
-    document.getElementById("output-text").contentWindow.eval($("#javascript-text-area").val())
-    }
-
-    // create function to update panels on page load
-    window.onload = function(){
-        updateContent()
-    }
 
 
-    var htmlEditor = document.getElementById("html-text-area");
-       
-    htmlEditor.addEventListener("keyup", function() {
-        localStorage.setItem("HtmlTextEditorData", htmlEditor.value) 
-         });
-    if (window.localStorage["HtmlTextEditorData"]) {
-        htmlEditor.value = localStorage.getItem("HtmlTextEditorData", htmlEditor) ;
-    } 
+    // ============================================
+    // Theme Switcher Functionality
+    // ============================================
+    function initThemeSwitcher() {
+        const themeSelector = document.getElementById('theme-selector');
+        const htmlElement = document.documentElement;
 
-    var cssEditor = document.querySelector("#css-text-area");
-    cssEditor.addEventListener("keyup", function() {
-        localStorage.setItem("CssTextEditorData", cssEditor.value) 
-         });
-    if (window.localStorage["CssTextEditorData"]) {
-        cssEditor.value = localStorage.getItem("CssTextEditorData", cssEditor) ;
-    } 
+        // Get saved theme or default to 'auto'
+        const savedTheme = localStorage.getItem('codedivs-theme') || 'auto';
+        themeSelector.value = savedTheme;
 
-    var javascriptEditor = document.querySelector("#javascript-text-area");
-    javascriptEditor.addEventListener("keyup", function() {
-        localStorage.setItem("JavascriptTextEditorData", javascriptEditor.value) 
-         });
-    if (window.localStorage["JavascriptTextEditorData"]) {
-        javascriptEditor.value = localStorage.getItem("JavascriptTextEditorData", javascriptEditor) ;
-    }
+        // Apply theme on load
+        applyTheme(savedTheme);
 
-    // Scope Emmet to HTML only by setting syntax attributes
-    htmlEditor.setAttribute('data-syntax', 'html');
-    cssEditor.setAttribute('data-syntax', 'css');
-    javascriptEditor.setAttribute('data-syntax', 'javascript');
-    
-    // HTML editor: Check for snippet expansion before Emmet
-    htmlEditor.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab') {
-            // Handle Shift+Tab for outdenting
-            if (e.shiftKey) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                removeTab(this);
-                return;
-            }
-            
-            // Close autocomplete dropdown on Tab
-            const dropdown = document.getElementById('autocomplete-dropdown');
-            if (dropdown && dropdown.style.display !== 'none' && dropdown.dataset.owner === this.id) {
-                dropdown.style.display = 'none';
-            }
-            
-            const currentWord = getCurrentWord(this);
-            // Only try snippet expansion for non-Emmet patterns
-            if (currentWord && !currentWord.includes('.') && !currentWord.includes('#') && !currentWord.includes('>')) {
-                const expanded = tryExpandSnippet(this);
-                if (expanded) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
+        // Listen for theme changes
+        themeSelector.addEventListener('change', function() {
+            const selectedTheme = this.value;
+            localStorage.setItem('codedivs-theme', selectedTheme);
+            applyTheme(selectedTheme);
+        });
+
+        // Listen for system theme changes (for auto mode)
+        if (window.matchMedia) {
+            const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            darkModeQuery.addListener(function() {
+                const currentTheme = localStorage.getItem('codedivs-theme') || 'auto';
+                if (currentTheme === 'auto') {
+                    applyTheme('auto');
                 }
-                // If not expanded, let Emmet handle it
+            });
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'auto') {
+                // Check system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    htmlElement.setAttribute('data-theme', 'dark');
+                } else {
+                    htmlElement.setAttribute('data-theme', 'light');
+                }
+            } else if (theme === 'light') {
+                htmlElement.setAttribute('data-theme', 'light');
+            } else {
+                htmlElement.setAttribute('data-theme', 'dark');
             }
         }
-    });
-    
-    // Prevent Emmet from interfering in CSS/JS editors - use Tab for snippets or indentation
-    cssEditor.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab') {
-            // Handle Shift+Tab for outdenting
-            if (e.shiftKey) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                removeTab(this);
-                return;
+    }
+
+    // Initialize theme switcher
+    initThemeSwitcher();
+
+    // ============================================
+    // Code Formatting Functionality
+    // ============================================
+
+    // HTML Formatter
+    function formatHTML(code) {
+        let formatted = '';
+        let indent = 0;
+        const tab = '  '; // 2 spaces
+
+        // Remove extra whitespace
+        code = code.trim().replace(/\s+</g, '<').replace(/>\s+/g, '>');
+
+        // Split by tags
+        const tags = code.match(/<[^>]+>|[^<]+/g) || [];
+
+        tags.forEach(tag => {
+            if (tag.startsWith('</')) {
+                // Closing tag - decrease indent before adding
+                indent = Math.max(0, indent - 1);
+                formatted += tab.repeat(indent) + tag + '\n';
+            } else if (tag.startsWith('<') && !tag.endsWith('/>') && !tag.startsWith('<!')) {
+                // Opening tag - add then increase indent
+                formatted += tab.repeat(indent) + tag + '\n';
+                // Don't increase indent for self-closing-style tags
+                if (!tag.match(/<(br|hr|img|input|meta|link|area|base|col|command|embed|keygen|param|source|track|wbr)/i)) {
+                    indent++;
+                }
+            } else if (tag.startsWith('<')) {
+                // Self-closing or special tags
+                formatted += tab.repeat(indent) + tag + '\n';
+            } else {
+                // Text content
+                const trimmed = tag.trim();
+                if (trimmed) {
+                    formatted += tab.repeat(indent) + trimmed + '\n';
+                }
             }
-            
-            const dropdown = document.getElementById('autocomplete-dropdown');
-            
-            // If autocomplete dropdown is open, accept suggestion with Tab
-            if (dropdown && dropdown.style.display !== 'none' && dropdown.dataset.owner === this.id) {
-                const firstItem = dropdown.querySelector('div');
-                if (firstItem) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    firstItem.click();
+        });
+
+        return formatted.trim();
+    }
+
+    // CSS Formatter
+    function formatCSS(code) {
+        let formatted = '';
+        let indent = 0;
+        const tab = '  ';
+
+        // Remove extra whitespace
+        code = code.replace(/\s+/g, ' ').trim();
+
+        // Add newlines and indentation
+        for (let i = 0; i < code.length; i++) {
+            const char = code[i];
+
+            if (char === '{') {
+                formatted += ' {\n';
+                indent++;
+            } else if (char === '}') {
+                indent = Math.max(0, indent - 1);
+                formatted += '\n' + tab.repeat(indent) + '}\n\n';
+            } else if (char === ';') {
+                formatted += ';\n' + tab.repeat(indent);
+            } else {
+                if (formatted.endsWith('\n') && char !== ' ') {
+                    formatted += tab.repeat(indent);
+                }
+                formatted += char;
+            }
+        }
+
+        return formatted.trim().replace(/\n\s*\n\s*\n/g, '\n\n');
+    }
+
+    // JavaScript Formatter
+    function formatJS(code) {
+        let formatted = '';
+        let indent = 0;
+        const tab = '  ';
+        let inString = false;
+        let stringChar = '';
+        let inComment = false;
+        let inMultiLineComment = false;
+
+        for (let i = 0; i < code.length; i++) {
+            const char = code[i];
+            const next = code[i + 1];
+            const prev = code[i - 1];
+
+            // Handle strings
+            if ((char === '"' || char === "'" || char === '`') && prev !== '\\') {
+                if (!inString) {
+                    inString = true;
+                    stringChar = char;
+                } else if (char === stringChar) {
+                    inString = false;
+                    stringChar = '';
+                }
+                formatted += char;
+                continue;
+            }
+
+            // Handle comments
+            if (!inString) {
+                if (char === '/' && next === '/' && !inMultiLineComment) {
+                    inComment = true;
+                    formatted += char;
+                    continue;
+                }
+                if (char === '/' && next === '*') {
+                    inMultiLineComment = true;
+                    formatted += char;
+                    continue;
+                }
+                if (char === '*' && next === '/' && inMultiLineComment) {
+                    formatted += char + next;
+                    i++;
+                    inMultiLineComment = false;
+                    continue;
+                }
+                if (char === '\n' && inComment) {
+                    inComment = false;
+                    formatted += '\n' + tab.repeat(indent);
+                    continue;
+                }
+            }
+
+            if (inString || inComment || inMultiLineComment) {
+                formatted += char;
+                continue;
+            }
+
+            // Format code structure
+            if (char === '{') {
+                formatted += ' {\n';
+                indent++;
+                if (next && next !== '\n' && next !== ' ') {
+                    formatted += tab.repeat(indent);
+                }
+            } else if (char === '}') {
+                indent = Math.max(0, indent - 1);
+                if (!formatted.endsWith('\n')) {
+                    formatted += '\n';
+                }
+                formatted += tab.repeat(indent) + '}';
+                if (next && next !== ';' && next !== '\n' && next !== ',') {
+                    formatted += '\n' + tab.repeat(indent);
+                }
+            } else if (char === ';') {
+                formatted += ';\n' + tab.repeat(indent);
+            } else if (char === '\n') {
+                if (!formatted.endsWith('\n')) {
+                    formatted += '\n' + tab.repeat(indent);
+                }
+            } else if (char === ' ' && (next === ' ' || prev === '\n')) {
+                // Skip extra spaces
+                continue;
+            } else {
+                if (formatted.endsWith('\n') && char !== ' ') {
+                    formatted += tab.repeat(indent);
+                }
+                formatted += char;
+            }
+        }
+
+        return formatted.trim().replace(/\n\s*\n\s*\n/g, '\n\n');
+    }
+
+
+    // ============================================
+    // Library Import Functionality
+    // ============================================
+    const libraries = [
+        {
+            name: 'Bootstrap 5',
+            desc: 'Popular CSS framework',
+            version: '5.3.0',
+            css: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+            js: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
+        },
+        {
+            name: 'Tailwind CSS',
+            desc: 'Utility-first CSS framework',
+            version: '3.3.0',
+            css: 'https://cdn.tailwindcss.com'
+        },
+        {
+            name: 'React',
+            desc: 'JavaScript library for UI',
+            version: '18.2.0',
+            js: 'https://unpkg.com/react@18/umd/react.production.min.js',
+            jsExtra: 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js'
+        },
+        {
+            name: 'Vue.js',
+            desc: 'Progressive JavaScript framework',
+            version: '3.3.4',
+            js: 'https://unpkg.com/vue@3.3.4/dist/vue.global.js'
+        },
+        {
+            name: 'Alpine.js',
+            desc: 'Lightweight JavaScript framework',
+            version: '3.13.0',
+            js: 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js'
+        },
+        {
+            name: 'Animate.css',
+            desc: 'CSS animations library',
+            version: '4.1.1',
+            css: 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'
+        },
+        {
+            name: 'Font Awesome',
+            desc: 'Icon library',
+            version: '6.4.0',
+            css: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+        },
+        {
+            name: 'Chart.js',
+            desc: 'Simple yet flexible charts',
+            version: '4.3.0',
+            js: 'https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js'
+        },
+        {
+            name: 'Axios',
+            desc: 'Promise-based HTTP client',
+            version: '1.4.0',
+            js: 'https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js'
+        },
+        {
+            name: 'Lodash',
+            desc: 'JavaScript utility library',
+            version: '4.17.21',
+            js: 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js'
+        },
+        {
+            name: 'Three.js',
+            desc: '3D graphics library',
+            version: 'r154',
+            js: 'https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js'
+        },
+        {
+            name: 'GSAP',
+            desc: 'Animation platform',
+            version: '3.12.0',
+            js: 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.0/gsap.min.js'
+        }
+    ];
+
+    const modal = document.getElementById('library-modal');
+    const importBtn = document.getElementById('importLibrary');
+    const closeBtn = document.querySelector('.close');
+    const libraryList = document.getElementById('library-list');
+    const searchInput = document.getElementById('library-search');
+
+    // Populate library list
+    const populateLibraries = (filterText = '') => {
+        libraryList.innerHTML = '';
+        const filtered = libraries.filter(lib =>
+            lib.name.toLowerCase().includes(filterText.toLowerCase()) ||
+            lib.desc.toLowerCase().includes(filterText.toLowerCase())
+        );
+
+        filtered.forEach(lib => {
+            const item = document.createElement('div');
+            item.className = 'library-item';
+            item.innerHTML = `
+                <div class="library-name">${lib.name}</div>
+                <div class="library-desc">${lib.desc}</div>
+                <div class="library-version">v${lib.version}</div>
+            `;
+
+            item.addEventListener('click', function() {
+                // Get active tab from VFS (if available)
+                if (window.VFS && window.VFS.activeTab) {
+                    const activeFile = window.VFS.files[window.VFS.activeTab];
+                    if (activeFile && activeFile.type === 'html') {
+                        let htmlContent = activeFile.content;
+                        let insertPosition = htmlContent.indexOf('</head>');
+
+                        if (insertPosition === -1) {
+                            insertPosition = htmlContent.indexOf('<body>');
+                            if (insertPosition === -1) {
+                                insertPosition = 0;
+                            }
+                        }
+
+                        let linksToAdd = '';
+
+                        if (lib.css) {
+                            linksToAdd += `  <link rel="stylesheet" href="${lib.css}">\n`;
+                        }
+                        if (lib.js) {
+                            linksToAdd += `  <script src="${lib.js}"></script>\n`;
+                        }
+                        if (lib.jsExtra) {
+                            linksToAdd += `  <script src="${lib.jsExtra}"></script>\n`;
+                        }
+
+                        if (insertPosition === 0) {
+                            htmlContent = linksToAdd + htmlContent;
+                        } else {
+                            htmlContent = htmlContent.slice(0, insertPosition) + linksToAdd + htmlContent.slice(insertPosition);
+                        }
+
+                        // Update VFS and editor
+                        activeFile.content = htmlContent;
+                        document.getElementById('unified-editor').value = htmlContent;
+                        window.VFS.saveCurrentContent();
+                        window.VFS.updateOutput();
+                    } else {
+                        alert('Please open an HTML file first to add this library.');
+                    }
+                } else {
+                    alert('VFS system not loaded. Please refresh the page.');
+                }
+
+                this.classList.add('selected');
+                setTimeout(() => {
+                    this.classList.remove('selected');
+                    modal.style.display = 'none';
+                }, 300);
+            });
+
+            libraryList.appendChild(item);
+        });
+
+        if (filtered.length === 0) {
+            libraryList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No libraries found</p>';
+        }
+    };
+
+    // Open modal
+    importBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.style.display = 'block';
+        populateLibraries();
+        searchInput.value = '';
+        searchInput.focus();
+    });
+
+    // Close modal
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        populateLibraries(this.value);
+    });
+
+    // ESC key to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+            modal.style.display = 'none';
+        }
+    });
+
+    // ============================================
+    // Export to Platforms Functionality
+    // ============================================
+    const exportBtn = document.getElementById('exportBtn');
+    const exportDropdown = document.querySelector('.export-dropdown');
+    const exportMenu = document.getElementById('exportMenu');
+
+    // Toggle dropdown
+    exportBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        exportDropdown.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!exportDropdown.contains(e.target)) {
+            exportDropdown.classList.remove('active');
+        }
+    });
+
+    // Get current code from VFS
+    const getCode = () => {
+        if (window.VFS && window.VFS.files) {
+            let html = '', css = '', js = '';
+
+            Object.values(window.VFS.files).forEach(file => {
+                if (file.type === 'html') html += file.content + '\n';
+                else if (file.type === 'css') css += file.content + '\n';
+                else if (file.type === 'javascript') js += file.content + '\n';
+            });
+
+            return { html: html.trim(), css: css.trim(), js: js.trim() };
+        }
+
+        // Fallback to empty
+        return { html: '', css: '', js: '' };
+    };
+
+    // Export to CodePen
+    document.getElementById('export-codepen').addEventListener('click', function(e) {
+        e.preventDefault();
+        const code = getCode();
+
+        const data = {
+            title: 'CodeDivs Export',
+            description: 'Created with CodeDivs',
+            html: code.html,
+            css: code.css,
+            js: code.js
+        };
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://codepen.io/pen/define';
+        form.target = '_blank';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'data';
+        input.value = JSON.stringify(data);
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        exportDropdown.classList.remove('active');
+    });
+
+    // Export to JSFiddle
+    document.getElementById('export-jsfiddle').addEventListener('click', function(e) {
+        e.preventDefault();
+        const code = getCode();
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://jsfiddle.net/api/post/library/pure/';
+        form.target = '_blank';
+
+        const fields = {
+            html: code.html,
+            css: code.css,
+            js: code.js,
+            title: 'CodeDivs Export'
+        };
+
+        Object.keys(fields).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = fields[key];
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        exportDropdown.classList.remove('active');
+    });
+
+    // Export to JSBin
+    document.getElementById('export-jsbin').addEventListener('click', function(e) {
+        e.preventDefault();
+        const code = getCode();
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://jsbin.com/?html,css,js,output';
+        form.target = '_blank';
+
+        const fields = {
+            html: code.html,
+            css: code.css,
+            javascript: code.js
+        };
+
+        Object.keys(fields).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = fields[key];
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        exportDropdown.classList.remove('active');
+    });
+
+    // ============================================
+    // URL-Based Code Sharing Functionality
+    // ============================================
+    const shareModal = document.getElementById('share-modal');
+    const shareBtn = document.getElementById('shareBtn');
+    const closeShareBtn = document.querySelector('.close-share');
+    const shareUrlInput = document.getElementById('share-url');
+    const copyUrlBtn = document.getElementById('copy-url-btn');
+    const copySuccess = document.getElementById('copy-success');
+
+    // Compress and encode code to URL hash
+    const compressToURL = (code) => {
+        const json = JSON.stringify(code);
+        // Use base64 encoding with URL-safe characters
+        const encoded = btoa(unescape(encodeURIComponent(json)))
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/, '');
+        return encoded;
+    };
+
+    // Decompress from URL hash
+    const decompressFromURL = (encoded) => {
+        try {
+            // Restore base64 padding and characters
+            const base64 = encoded
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
+            const padding = base64.length % 4;
+            const padded = padding ? base64 + '='.repeat(4 - padding) : base64;
+
+            const json = decodeURIComponent(escape(atob(padded)));
+            return JSON.parse(json);
+        } catch (e) {
+            console.error('Failed to decompress code:', e);
+            return null;
+        }
+    };
+
+    // Load code from URL hash on page load
+    const loadFromURL = () => {
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            const code = decompressFromURL(hash);
+            if (code && window.VFS) {
+                // Clear existing files and create new ones from shared code
+                window.VFS.files = {};
+
+                if (code.html) {
+                    const htmlId = window.VFS.createFile('shared.html', 'html', code.html);
+                    window.VFS.openTab(htmlId);
+                }
+                if (code.css) {
+                    window.VFS.createFile('shared.css', 'css', code.css);
+                }
+                if (code.js) {
+                    window.VFS.createFile('shared.js', 'javascript', code.js);
+                }
+
+                window.VFS.updateOutput();
+            }
+        }
+    };
+
+    // Generate shareable URL
+    const generateShareURL = () => {
+        const code = getCode();
+        const compressed = compressToURL(code);
+        const url = window.location.origin + window.location.pathname + '#' + compressed;
+        return url;
+    };
+
+    // Open share modal
+    shareBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const shareUrl = generateShareURL();
+        shareUrlInput.value = shareUrl;
+        shareModal.style.display = 'block';
+        copySuccess.classList.remove('show');
+
+        // Update social share links
+        const twitterUrl = `https://twitter.com/intent/tweet?text=Check out my code on CodeDivs!&url=${encodeURIComponent(shareUrl)}`;
+        const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+
+        document.getElementById('share-twitter').href = twitterUrl;
+        document.getElementById('share-linkedin').href = linkedinUrl;
+    });
+
+    // Close share modal
+    closeShareBtn.addEventListener('click', function() {
+        shareModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target === shareModal) {
+            shareModal.style.display = 'none';
+        }
+    });
+
+    // Copy URL to clipboard
+    copyUrlBtn.addEventListener('click', async function() {
+        try {
+            await navigator.clipboard.writeText(shareUrlInput.value);
+            copySuccess.classList.add('show');
+            setTimeout(() => {
+                copySuccess.classList.remove('show');
+            }, 3000);
+        } catch (err) {
+            // Fallback for older browsers
+            shareUrlInput.select();
+            document.execCommand('copy');
+            copySuccess.classList.add('show');
+            setTimeout(() => {
+                copySuccess.classList.remove('show');
+            }, 3000);
+        }
+    });
+
+    // Load shared code on page load
+    loadFromURL();
+
+    // Listen for hash changes (browser back/forward)
+    window.addEventListener('hashchange', loadFromURL);
+
+    // ============================================
+    // Virtual File System with Tabs
+    // ============================================
+    const VFS = {
+        files: {},
+        folders: {},
+        collapsedFolders: {},
+        openTabs: [],
+        activeTab: null,
+        popoutWindow: null,
+
+        init() {
+            // Start with editor disabled
+            this.disableEditor();
+
+            this.loadFromStorage();
+            this.loadTabsFromStorage();
+            this.setupEventListeners();
+            this.renderFileTree();
+
+            // Create default files if none exist
+            if (Object.keys(this.files).length === 0) {
+                this.createFile('index.html', 'html', '<p>Hello World!</p>');
+                this.createFile('style.css', 'css', 'html{padding: 1rem}');
+                this.createFile('script.js', 'javascript', '// enter your JS code here =)');
+            }
+
+            // Open tabs or first file
+            if (this.openTabs.length > 0) {
+                this.renderTabs();
+                if (this.activeTab) {
+                    this.switchToTab(this.activeTab);
+                }
+            } else if (Object.keys(this.files).length > 0) {
+                const firstFileId = Object.keys(this.files)[0];
+                this.openTab(firstFileId);
+            }
+        },
+
+        createFile(name, type, content = '', folderId = null) {
+            const id = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            this.files[id] = {
+                id,
+                name,
+                type,
+                content,
+                folderId,
+                created: new Date().toISOString()
+            };
+            this.saveToStorage();
+            this.renderFileTree();
+            return id;
+        },
+
+        createFolder(name, parentId = null) {
+            const id = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            this.folders[id] = {
+                id,
+                name,
+                parentId,
+                created: new Date().toISOString()
+            };
+            this.saveToStorage();
+            this.renderFileTree();
+            return id;
+        },
+
+        deleteFile(id) {
+            if (!this.files[id]) return;
+
+            if (confirm(`Delete ${this.files[id].name}?`)) {
+                // Close tab if open
+                this.closeTab(id);
+
+                // Delete file
+                delete this.files[id];
+
+                this.saveToStorage();
+                this.renderFileTree();
+            }
+        },
+
+        deleteFolder(id) {
+            if (!this.folders[id]) return;
+
+            // Check if folder has files or subfolders
+            const hasFiles = Object.values(this.files).some(file => file.folderId === id);
+            const hasSubfolders = Object.values(this.folders).some(folder => folder.parentId === id);
+
+            if (hasFiles || hasSubfolders) {
+                if (!confirm(`Folder "${this.folders[id].name}" is not empty. Delete it and all its contents?`)) {
+                    return;
+                }
+
+                // Delete all files in folder
+                Object.keys(this.files).forEach(fileId => {
+                    if (this.files[fileId].folderId === id) {
+                        this.closeTab(fileId);
+                        delete this.files[fileId];
+                    }
+                });
+
+                // Delete all subfolders recursively
+                Object.keys(this.folders).forEach(folderId => {
+                    if (this.folders[folderId].parentId === id) {
+                        this.deleteFolder(folderId);
+                    }
+                });
+            } else {
+                if (!confirm(`Delete folder "${this.folders[id].name}"?`)) {
                     return;
                 }
             }
-            
-            // Otherwise, try snippet expansion or indent
-            const expanded = tryExpandSnippet(this);
-            if (!expanded) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                insertTab(this);
-            } else {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-            }
-        }
-    });
-    
-    javascriptEditor.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab') {
-            // Handle Shift+Tab for outdenting
-            if (e.shiftKey) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                removeTab(this);
+
+            delete this.folders[id];
+            delete this.collapsedFolders[id];
+            this.saveToStorage();
+            this.renderFileTree();
+        },
+
+        openTab(fileId) {
+            if (!this.files[fileId]) return;
+
+            // Check if already open
+            if (this.openTabs.includes(fileId)) {
+                this.switchToTab(fileId);
                 return;
             }
-            
-            const dropdown = document.getElementById('autocomplete-dropdown');
-            
-            // If autocomplete dropdown is open, accept suggestion with Tab
-            if (dropdown && dropdown.style.display !== 'none' && dropdown.dataset.owner === this.id) {
-                const firstItem = dropdown.querySelector('div');
-                if (firstItem) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    firstItem.click();
-                    return;
+
+            // Add to open tabs
+            this.openTabs.push(fileId);
+            this.activeTab = fileId;
+
+            this.renderTabs();
+            this.loadFileContent(fileId);
+            this.saveTabsToStorage();
+        },
+
+        closeTab(fileId) {
+            const index = this.openTabs.indexOf(fileId);
+            if (index === -1) return;
+
+            // Save current content before closing
+            if (this.activeTab === fileId) {
+                this.saveCurrentContent();
+            }
+
+            // Remove from open tabs
+            this.openTabs.splice(index, 1);
+
+            // Switch to another tab or disable editor
+            if (this.activeTab === fileId) {
+                if (this.openTabs.length > 0) {
+                    const newActiveIndex = Math.max(0, index - 1);
+                    this.switchToTab(this.openTabs[newActiveIndex]);
+                } else {
+                    this.activeTab = null;
+                    this.disableEditor();
                 }
             }
-            
-            // Otherwise, try snippet expansion or indent
-            const expanded = tryExpandSnippet(this);
-            if (!expanded) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                insertTab(this);
+
+            this.renderTabs();
+            this.saveTabsToStorage();
+        },
+
+        switchToTab(fileId) {
+            if (!this.files[fileId]) return;
+
+            // Save current tab content
+            if (this.activeTab && this.activeTab !== fileId) {
+                this.saveCurrentContent();
+            }
+
+            this.activeTab = fileId;
+            this.loadFileContent(fileId);
+            this.renderTabs();
+            this.renderFileTree();
+            this.saveTabsToStorage();
+        },
+
+        loadFileContent(fileId) {
+            const file = this.files[fileId];
+            if (!file) return;
+
+            const editor = document.getElementById('unified-editor');
+            editor.value = file.content || '';
+            editor.disabled = false;
+
+            this.updateOutput();
+        },
+
+        saveCurrentContent() {
+            if (!this.activeTab) return;
+
+            const file = this.files[this.activeTab];
+            if (!file) return;
+
+            const editor = document.getElementById('unified-editor');
+            file.content = editor.value;
+
+            this.saveToStorage();
+        },
+
+        disableEditor() {
+            const editor = document.getElementById('unified-editor');
+            editor.value = '';
+            editor.disabled = true;
+            editor.placeholder = 'No file open. Create or open a file to start coding.';
+        },
+
+        updateOutput() {
+            // Combine all HTML files and inject CSS/JS
+            let htmlContent = '';
+            let cssContent = '';
+            let jsContent = '';
+
+            Object.values(this.files).forEach(file => {
+                if (file.type === 'html') {
+                    htmlContent += file.content + '\n';
+                } else if (file.type === 'css') {
+                    cssContent += file.content + '\n';
+                } else if (file.type === 'javascript') {
+                    jsContent += file.content + '\n';
+                }
+            });
+
+            const output = document.getElementById('output-text');
+            const completeHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>${cssContent}</style>
+                </head>
+                <body>
+                    ${htmlContent}
+                    <script>${jsContent}</script>
+                </body>
+                </html>
+            `;
+
+            if (this.popoutWindow && !this.popoutWindow.closed) {
+                this.popoutWindow.document.open();
+                this.popoutWindow.document.write(completeHTML);
+                this.popoutWindow.document.close();
+            }
+
+            output.srcdoc = completeHTML;
+        },
+
+        saveToStorage() {
+            const vfsData = {
+                files: this.files,
+                folders: this.folders,
+                collapsedFolders: this.collapsedFolders
+            };
+            localStorage.setItem('codedivs-vfs', JSON.stringify(vfsData));
+        },
+
+        loadFromStorage() {
+            const saved = localStorage.getItem('codedivs-vfs');
+            if (saved) {
+                try {
+                    const vfsData = JSON.parse(saved);
+                    // Support old format (just files) and new format (files + folders)
+                    if (vfsData.files) {
+                        this.files = vfsData.files;
+                        this.folders = vfsData.folders || {};
+                        this.collapsedFolders = vfsData.collapsedFolders || {};
+                    } else {
+                        // Old format - just files
+                        this.files = vfsData;
+                        this.folders = {};
+                        this.collapsedFolders = {};
+                    }
+                } catch (e) {
+                    console.error('Failed to load VFS:', e);
+                    this.files = {};
+                    this.folders = {};
+                    this.collapsedFolders = {};
+                }
+            }
+        },
+
+        saveTabsToStorage() {
+            const tabState = {
+                openTabs: this.openTabs,
+                activeTab: this.activeTab
+            };
+            localStorage.setItem('codedivs-tabs', JSON.stringify(tabState));
+        },
+
+        loadTabsFromStorage() {
+            const saved = localStorage.getItem('codedivs-tabs');
+            if (saved) {
+                try {
+                    const tabState = JSON.parse(saved);
+                    this.openTabs = tabState.openTabs || [];
+                    this.activeTab = tabState.activeTab || null;
+                } catch (e) {
+                    console.error('Failed to load tabs:', e);
+                }
+            }
+        },
+
+        renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = '';
+
+            this.openTabs.forEach(fileId => {
+                const file = this.files[fileId];
+                if (!file) return;
+
+                const tab = document.createElement('div');
+                tab.className = 'tab' + (this.activeTab === fileId ? ' active' : '');
+
+                const icon = this.getFileIcon(file.type);
+
+                tab.innerHTML = `
+                    <div class="tab-icon">${icon}</div>
+                    <div class="tab-name">${file.name}</div>
+                    <button class="tab-close">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                `;
+
+                tab.addEventListener('click', (e) => {
+                    if (!e.target.closest('.tab-close')) {
+                        this.switchToTab(fileId);
+                    }
+                });
+
+                const closeBtn = tab.querySelector('.tab-close');
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.closeTab(fileId);
+                });
+
+                container.appendChild(tab);
+            });
+        },
+
+        renderFileTree() {
+            const tree = document.getElementById('file-tree');
+            tree.innerHTML = '';
+
+            // Render folders and files recursively
+            const renderItems = (parentId = null, level = 0) => {
+                // Render folders first
+                Object.values(this.folders)
+                    .filter(folder => folder.parentId === parentId)
+                    .forEach(folder => {
+                        const folderItem = document.createElement('div');
+                        folderItem.className = 'folder-item';
+                        folderItem.style.paddingLeft = `${level * 16}px`;
+
+                        const isCollapsed = this.collapsedFolders[folder.id];
+                        const chevron = isCollapsed ? '▸' : '▾';
+
+                        folderItem.innerHTML = `
+                            <span class="folder-toggle">${chevron}</span>
+                            <svg class="folder-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span class="folder-name">${folder.name}</span>
+                            <button class="folder-delete" data-id="${folder.id}">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 6L6 18M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        `;
+
+                        // Toggle collapse/expand
+                        const toggleBtn = folderItem.querySelector('.folder-toggle');
+                        toggleBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.toggleFolder(folder.id);
+                        });
+
+                        // Delete folder
+                        const deleteBtn = folderItem.querySelector('.folder-delete');
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.deleteFolder(folder.id);
+                        });
+
+                        tree.appendChild(folderItem);
+
+                        // Render nested items if folder is expanded
+                        if (!isCollapsed) {
+                            renderItems(folder.id, level + 1);
+                        }
+                    });
+
+                // Render files at this level
+                Object.values(this.files)
+                    .filter(file => file.folderId === parentId)
+                    .forEach(file => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item' + (this.activeTab === file.id ? ' active' : '');
+                        fileItem.style.paddingLeft = `${(level * 16) + 16}px`;
+
+                        const icon = this.getFileIcon(file.type);
+
+                        fileItem.innerHTML = `
+                            ${icon}
+                            <span class="file-name">${file.name}</span>
+                            <button class="file-delete" data-id="${file.id}">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 6L6 18M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        `;
+
+                        fileItem.addEventListener('click', (e) => {
+                            if (!e.target.closest('.file-delete')) {
+                                this.openTab(file.id);
+                            }
+                        });
+
+                        const deleteBtn = fileItem.querySelector('.file-delete');
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.deleteFile(file.id);
+                        });
+
+                        tree.appendChild(fileItem);
+                    });
+            };
+
+            // Start rendering from root level (parentId = null)
+            renderItems(null, 0);
+        },
+
+        toggleFolder(id) {
+            if (this.collapsedFolders[id]) {
+                delete this.collapsedFolders[id];
             } else {
-                e.preventDefault();
-                e.stopImmediatePropagation();
+                this.collapsedFolders[id] = true;
+            }
+            this.saveToStorage();
+            this.renderFileTree();
+        },
+
+        getFileIcon(type) {
+            const icons = {
+                html: '<svg class="file-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+                css: '<svg class="file-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>',
+                javascript: '<svg class="file-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
+            };
+            return icons[type] || icons.html;
+        },
+
+        setupEventListeners() {
+            // New file button
+            const newFileBtn = document.getElementById('new-file-btn');
+            if (newFileBtn) {
+                newFileBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const name = prompt('Enter file name (e.g., test.html, styles.css, app.js):');
+                    if (name && name.trim()) {
+                        let type = 'html';
+                        if (name.endsWith('.css')) type = 'css';
+                        else if (name.endsWith('.js')) type = 'javascript';
+
+                        let folderId = null;
+                        const folders = Object.values(this.folders);
+                        if (folders.length > 0) {
+                            const folderNames = ['Root (no folder)', ...folders.map(f => f.name)];
+                            const choice = prompt(`Choose folder:\n${folderNames.map((n, i) => `${i}: ${n}`).join('\n')}\n\nEnter number (default 0):`);
+                            if (choice === null) return; // User cancelled
+                            const folderIndex = parseInt(choice) || 0;
+                            if (folderIndex > 0 && folderIndex <= folders.length) {
+                                folderId = folders[folderIndex - 1].id;
+                            }
+                        }
+
+                        const id = this.createFile(name.trim(), type, '', folderId);
+                        this.openTab(id);
+                    }
+                };
+            }
+
+            // New folder button
+            const newFolderBtn = document.getElementById('new-folder-btn');
+            if (newFolderBtn) {
+                newFolderBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const name = prompt('Enter folder name:');
+                    if (name && name.trim()) {
+                        this.createFolder(name.trim());
+                    }
+                };
+            }
+
+            // Toggle explorer
+            const toggleExplorerBtn = document.getElementById('toggle-explorer');
+            if (toggleExplorerBtn) {
+                toggleExplorerBtn.addEventListener('click', () => {
+                    const explorer = document.getElementById('file-explorer');
+                    explorer.classList.toggle('collapsed');
+                });
+            }
+
+            // Pop-out output button
+            const popoutBtn = document.getElementById('popout-output-btn');
+            if (popoutBtn) {
+                popoutBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    if (this.popoutWindow && !this.popoutWindow.closed) {
+                        this.popoutWindow.focus();
+                        return;
+                    }
+
+                    // Open pop-out window
+                    this.popoutWindow = window.open('', 'CodeDivs Output', 'width=800,height=600,menubar=no,toolbar=no,location=no');
+
+                    if (this.popoutWindow) {
+                        // Hide main output panel
+                        document.getElementById('output-container').style.display = 'none';
+
+                        // Update output to populate pop-out
+                        this.updateOutput();
+
+                        // Re-show main output when pop-out closes
+                        const checkClosed = setInterval(() => {
+                            if (this.popoutWindow.closed) {
+                                clearInterval(checkClosed);
+                                document.getElementById('output-container').style.display = 'flex';
+                                this.popoutWindow = null;
+                                this.updateOutput();
+                            }
+                        }, 500);
+                    }
+                };
+            }
+
+            // Toggle output button
+            const toggleOutputBtn = document.getElementById('toggle-output-btn');
+            if (toggleOutputBtn) {
+                toggleOutputBtn.addEventListener('click', () => {
+                    const outputContainer = document.getElementById('output-container');
+                    if (outputContainer.style.display === 'none') {
+                        outputContainer.style.display = 'flex';
+                    } else {
+                        outputContainer.style.display = 'none';
+                    }
+                });
+            }
+
+            // Close output button
+            const closeOutputBtn = document.getElementById('close-output-btn');
+            if (closeOutputBtn) {
+                closeOutputBtn.addEventListener('click', () => {
+                    document.getElementById('output-container').style.display = 'none';
+                });
+            }
+
+            // Format button
+            const formatBtn = document.getElementById('format-current');
+            if (formatBtn) {
+                formatBtn.addEventListener('click', () => {
+                    if (!this.activeTab) return;
+
+                    const file = this.files[this.activeTab];
+                    const editor = document.getElementById('unified-editor');
+                    const code = editor.value;
+
+                    let formatted;
+                    if (file.type === 'html') {
+                        formatted = formatHTML(code);
+                    } else if (file.type === 'css') {
+                        formatted = formatCSS(code);
+                    } else if (file.type === 'javascript') {
+                        formatted = formatJS(code);
+                    } else {
+                        return;
+                    }
+
+                    editor.value = formatted;
+                    this.saveCurrentContent();
+                    this.updateOutput();
+                });
+            }
+
+            // Auto-save on typing in unified editor
+            const editor = document.getElementById('unified-editor');
+            if (editor) {
+                let saveTimeout;
+                editor.addEventListener('input', () => {
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(() => {
+                        this.saveCurrentContent();
+                        this.updateOutput();
+                    }, 500);
+                });
             }
         }
-    });
+    };
 
-    // Initialize bracket highlighting and autocomplete for all editors
-    highlightBrackets(htmlEditor);
-    highlightBrackets(cssEditor);
-    highlightBrackets(javascriptEditor);
-    
-    // HTML editor: light autocomplete that doesn't conflict with Emmet
-    setupAutocomplete(htmlEditor, htmlSuggestions, true, htmlSnippets);
-    setupAutocomplete(cssEditor, cssSuggestions, false, cssSnippets);
-    setupAutocomplete(javascriptEditor, jsSuggestions, false, jsSnippets);
-    
-    // Setup undo/redo functionality for all editors
-    setupUndoRedo(htmlEditor);
-    setupUndoRedo(cssEditor);
-    setupUndoRedo(javascriptEditor); 
+    // Initialize VFS and make it globally accessible
+    window.VFS = VFS;
+    VFS.init();
 
 
-
-    // create a download file of the textareas
-   /*   function download(){
-        var fullText = [];
-        var htmlText = document.getElementById("html-text-area").value;
-        var cssText = document.getElementById("css-text-area").value;
-        var javascriptText = document.getElementById("javascript-text-area").value;
-        fullText = [htmlText, cssText, javascriptText]
-        var blob = new Blob([fullText], { type: "text/plain"});
-        var anchor = document.createElement("a");
-        anchor.download = "code-div.txt";
-        anchor.href = window.URL.createObjectURL(blob);
-        anchor.target ="_blank";
-        anchor.style.display = "none"; // just to be safe!
-        document.body.appendChild(anchor);
-        anchor.click();
-        document.body.removeChild(anchor);
-    }  */
-
-
+    // Update Save to File button to work with VFS
     $(function() {
         $('#saveToFile').click(function(e) {
-          var data = document.getElementById('html-text-area').value + document.getElementById('css-text-area').value + document.getElementById('javascript-text-area').value;
-          var data = 'data:application/csv;charset=utf-8,' + encodeURIComponent(data);
-          var el = e.currentTarget;
-          el.href = data;
-          el.target = '_blank';
-          el.download = 'code-divs.txt';
+            if (window.VFS && window.VFS.files) {
+                const code = getCode();
+                const data = 'HTML:\n' + code.html + '\n\nCSS:\n' + code.css + '\n\nJavaScript:\n' + code.js;
+                const dataUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(data);
+                const el = e.currentTarget;
+                el.href = dataUri;
+                el.target = '_blank';
+                el.download = 'codedivs-export.txt';
+            } else {
+                alert('VFS system not loaded. Please refresh the page.');
+            }
         });
-      });
+    });
 
 
 })
