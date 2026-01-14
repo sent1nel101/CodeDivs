@@ -2,18 +2,18 @@
 
 **CodeDivs** is a powerful, free-to-use, browser-based coding sandbox for practicing and prototyping HTML, CSS, and JavaScript in a live environment. No installation required – just open and code!
 
-![Version](https://img.shields.io/badge/version-2.0-blue)
+![Version](https://img.shields.io/badge/version-3.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Made with](https://img.shields.io/badge/made%20with-JavaScript-yellow)
 
 ## 🚀 Features
 
 ### Core Functionality
-- **Three-Panel Editor**: Separate editors for HTML, CSS, and JavaScript
+- **Unified Code Editor**: Single powerful editor with tab-based file management
 - **Live Preview**: Real-time output rendering in iframe
+- **Pop-out Output Window**: Detach output to a separate window for dual-monitor setups
 - **Persistent Storage**: Your code is automatically saved using localStorage
 - **Responsive Layout**: Toggle between horizontal and vertical panel views
-- **Panel Visibility Controls**: Show/hide individual editor panels
 - **Save to File**: Download your code as a text file
 
 ### Enhanced Code Editing
@@ -28,6 +28,9 @@
 
 ### New Productivity Features
 - 📁 **Virtual File System**: Create, manage, and organize multiple files with a built-in file explorer
+- 📂 **Folder Organization**: Create folders to organize your files hierarchically
+- 🗂️ **Tab System**: Open multiple files in tabs, switch between them seamlessly
+- 🖥️ **Pop-out Output**: Detach the output preview to a separate window
 - 📦 **Library Import**: Quick-add popular libraries (Bootstrap, React, Vue, etc.)
 - 🔗 **Export to Platforms**: One-click export to CodePen, JSFiddle, or JSBin
 - 🌐 **URL Sharing**: Share your code via shareable links with social media integration
@@ -41,10 +44,11 @@
 3. Start coding immediately!
 
 ### Usage
-1. **HTML Panel**: Write your HTML structure (Emmet supported)
-2. **CSS Panel**: Style your page with CSS
-3. **JavaScript Panel**: Add interactivity with JavaScript
-4. **Output Panel**: View live results instantly
+1. **Create Files**: Click "New File" to create HTML, CSS, or JS files
+2. **Organize with Folders**: Click "New Folder" to create folders and organize your files
+3. **Edit Code**: Click on any file to open it in the unified editor
+4. **Use Tabs**: Open multiple files and switch between them using tabs
+5. **View Output**: See live results in the output panel (or pop it out to a separate window)
 
 ## ⌨️ Keyboard Shortcuts
 
@@ -53,9 +57,9 @@
 | `Ctrl + Z` | Undo |
 | `Ctrl + Y` | Redo |
 | `Ctrl + Shift + Z` | Redo (alternative) |
-| `Ctrl + Shift + F` | Format code (HTML, CSS, or JS) |
-| `Tab` (HTML) | Expand Emmet abbreviation or snippet |
-| `Tab` (CSS/JS) | Expand snippet or indent |
+| `Ctrl + Shift + F` | Format code (based on active file type) |
+| `Tab` (HTML files) | Expand Emmet abbreviation or snippet |
+| `Tab` (CSS/JS files) | Expand snippet or indent |
 | `Shift + Tab` | Outdent (remove indentation) |
 | `Enter` | Accept autocomplete suggestion |
 | `Esc` | Close autocomplete dropdown or modals |
@@ -269,10 +273,10 @@ Expands to:
 - Non-intrusive dropdown positioning
 
 ### Undo/Redo System
-- Saves up to 100 states per editor
+- Saves up to 100 states per file
 - Debounced saving (300ms after typing stops)
 - Restores cursor position
-- Independent history for each editor
+- Independent history for each open file
 
 ### Auto-Close Brackets
 - Automatically adds closing bracket when opening bracket is typed
@@ -318,14 +322,31 @@ Expands to:
 ### Virtual File System
 - **File Explorer Sidebar**: Visual file tree with easy navigation
 - **Multi-file Support**: Create and manage multiple HTML, CSS, and JS files
+- **Folder Organization**:
+  - Create folders to organize your project structure
+  - Nested folder hierarchy support
+  - Collapse/expand folders with visual indicators
+  - Recursive folder deletion with confirmation
+- **Tab-Based Editing**:
+  - Open multiple files simultaneously in tabs
+  - Quick tab switching with visual active state
+  - Close tabs individually with unsaved changes protection
 - **File Operations**:
   - Create new files with automatic type detection
+  - Place files directly into folders during creation
   - Delete files with confirmation
   - Switch between files seamlessly
 - **Auto-save**: Changes automatically saved to localStorage
-- **Persistent Storage**: All files preserved between sessions
+- **Persistent Storage**: All files and folders preserved between sessions
 - **Collapsible Interface**: Hide/show file explorer to maximize workspace
 - **Mobile-Friendly**: Responsive file explorer for mobile devices
+
+### Pop-out Output Window
+- **Detachable Preview**: Click the pop-out button to open output in a separate window
+- **Dual-Monitor Support**: Perfect for coding on one screen, viewing output on another
+- **Synchronized Updates**: Changes in the editor automatically update the pop-out window
+- **Auto-Return**: Output returns to main window when pop-out is closed
+- **Smart Clearing**: Output automatically clears when all HTML files are deleted
 
 ## 📱 Browser Compatibility
 

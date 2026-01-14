@@ -1523,6 +1523,7 @@ $('#toggler').on('click', function(){
 
                 this.saveToStorage();
                 this.renderFileTree();
+                this.updateOutput();
             }
         },
 
@@ -1562,6 +1563,7 @@ $('#toggler').on('click', function(){
             delete this.collapsedFolders[id];
             this.saveToStorage();
             this.renderFileTree();
+            this.updateOutput();
         },
 
         openTab(fileId) {
@@ -1671,6 +1673,18 @@ $('#toggler').on('click', function(){
             });
 
             const output = document.getElementById('output-text');
+
+            // Clear output if no HTML content exists
+            if (!htmlContent.trim()) {
+                output.srcdoc = '';
+                if (this.popoutWindow && !this.popoutWindow.closed) {
+                    this.popoutWindow.document.open();
+                    this.popoutWindow.document.write('');
+                    this.popoutWindow.document.close();
+                }
+                return;
+            }
+
             const completeHTML = `
                 <!DOCTYPE html>
                 <html>
