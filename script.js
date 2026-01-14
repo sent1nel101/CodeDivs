@@ -1604,21 +1604,62 @@ $('#toggler').on('click', function(){
             if (index === -1) return;
 
             // Save current content before closing
-            if (this.activeTab === fileId) {
-                this.saveCurrentContent();
+            if (this.splitMode) {
+                if (this.activeTab1 === fileId) {
+                    this.saveCurrentContent();
+                }
+                if (this.activeTab2 === fileId) {
+                    this.saveCurrentContent2();
+                }
+            } else {
+                if (this.activeTab === fileId) {
+                    this.saveCurrentContent();
+                }
             }
 
             // Remove from open tabs
             this.openTabs.splice(index, 1);
 
-            // Switch to another tab or disable editor
-            if (this.activeTab === fileId) {
-                if (this.openTabs.length > 0) {
-                    const newActiveIndex = Math.max(0, index - 1);
-                    this.switchToTab(this.openTabs[newActiveIndex]);
-                } else {
-                    this.activeTab = null;
-                    this.disableEditor();
+            // Handle split mode tab switching
+            if (this.splitMode) {
+                // If closing tab in panel 1
+                if (this.activeTab1 === fileId) {
+                    if (this.openTabs.length > 0) {
+                        const newTab = this.openTabs[Math.max(0, index - 1)];
+                        if (newTab !== this.activeTab2) {
+                            this.activeTab1 = newTab;
+                            this.loadFileContentInPanel(newTab, 1);
+                        } else {
+                            this.activeTab1 = null;
+                        }
+                    } else {
+                        this.activeTab1 = null;
+                    }
+                }
+                // If closing tab in panel 2
+                if (this.activeTab2 === fileId) {
+                    if (this.openTabs.length > 0) {
+                        const newTab = this.openTabs[Math.max(0, index - 1)];
+                        if (newTab !== this.activeTab1) {
+                            this.activeTab2 = newTab;
+                            this.loadFileContentInPanel(newTab, 2);
+                        } else {
+                            this.activeTab2 = null;
+                        }
+                    } else {
+                        this.activeTab2 = null;
+                    }
+                }
+            } else {
+                // Single mode - switch to another tab or disable editor
+                if (this.activeTab === fileId) {
+                    if (this.openTabs.length > 0) {
+                        const newActiveIndex = Math.max(0, index - 1);
+                        this.switchToTab(this.openTabs[newActiveIndex]);
+                    } else {
+                        this.activeTab = null;
+                        this.disableEditor();
+                    }
                 }
             }
 
@@ -1670,6 +1711,12 @@ $('#toggler').on('click', function(){
         },
 
         toggleSplitView() {
+            // Prevent split view on mobile (< 600px)
+            if (window.innerWidth < 600) {
+                alert('Split view is not available on mobile devices. Please use a larger screen.');
+                return;
+            }
+
             this.splitMode = !this.splitMode;
 
             if (this.splitMode) {
