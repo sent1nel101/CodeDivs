@@ -754,6 +754,12 @@ $(function () {
 $('#toggler').on('click', function(){
     $('.contentWrapper').toggleClass('wrapperToggled')
     $('#toggler').toggleClass('toggled')
+    
+    // Update split-view orientation if in split mode
+    if (window.VFS && window.VFS.splitMode) {
+        window.VFS.splitOrientation = window.VFS.splitOrientation === 'horizontal' ? 'vertical' : 'horizontal';
+        window.VFS.updateSplitViewLayout();
+    }
 })
 
 // toggle display of input and output panels
@@ -1815,6 +1821,21 @@ $('#toggler').on('click', function(){
                 panel1.style.height = this.panelHeights.panel1 + '%';
                 panel2.style.height = this.panelHeights.panel2 + '%';
             }
+        },
+
+        updateSplitViewLayout() {
+            const wrapper = document.getElementById('editor-panels-wrapper');
+            if (!wrapper) return;
+
+            // Update grid layout class
+            wrapper.classList.remove('split-horizontal', 'split-vertical');
+            wrapper.classList.add('split-' + this.splitOrientation);
+
+            // Apply panel sizes based on orientation
+            this.applyPanelSizes();
+
+            // Save state
+            this.saveSplitViewState();
         },
 
         loadFileContent(fileId) {
