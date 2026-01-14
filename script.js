@@ -1910,6 +1910,7 @@ $('#toggler').on('click', function(){
             let cssContent = '';
             let jsContent = '';
 
+            // Start with all files
             Object.values(this.files).forEach(file => {
                 if (file.type === 'html') {
                     htmlContent += file.content + '\n';
@@ -1919,6 +1920,42 @@ $('#toggler').on('click', function(){
                     jsContent += file.content + '\n';
                 }
             });
+
+            // In split mode, also include editor content that might not be saved yet
+            if (this.splitMode) {
+                const editor1 = document.getElementById('unified-editor');
+                const editor2 = document.getElementById('unified-editor-2');
+
+                if (this.activeTab1 && editor1 && editor1.value) {
+                    const file1 = this.files[this.activeTab1];
+                    if (file1) {
+                        const currentContent1 = editor1.value;
+                        // Update content type detection
+                        if (file1.type === 'html' && !htmlContent.includes(currentContent1)) {
+                            htmlContent = currentContent1 + '\n' + htmlContent;
+                        } else if (file1.type === 'css' && !cssContent.includes(currentContent1)) {
+                            cssContent = currentContent1 + '\n' + cssContent;
+                        } else if (file1.type === 'javascript' && !jsContent.includes(currentContent1)) {
+                            jsContent = currentContent1 + '\n' + jsContent;
+                        }
+                    }
+                }
+
+                if (this.activeTab2 && editor2 && editor2.value) {
+                    const file2 = this.files[this.activeTab2];
+                    if (file2) {
+                        const currentContent2 = editor2.value;
+                        // Update content type detection
+                        if (file2.type === 'html' && !htmlContent.includes(currentContent2)) {
+                            htmlContent += '\n' + currentContent2;
+                        } else if (file2.type === 'css' && !cssContent.includes(currentContent2)) {
+                            cssContent += '\n' + currentContent2;
+                        } else if (file2.type === 'javascript' && !jsContent.includes(currentContent2)) {
+                            jsContent += '\n' + currentContent2;
+                        }
+                    }
+                }
+            }
 
             const output = document.getElementById('output-text');
 
@@ -2362,6 +2399,19 @@ $('#toggler').on('click', function(){
                     clearTimeout(saveTimeout);
                     saveTimeout = setTimeout(() => {
                         this.saveCurrentContent();
+                        this.updateOutput();
+                    }, 500);
+                });
+            }
+
+            // Auto-save on typing in second editor (split mode)
+            const editor2 = document.getElementById('unified-editor-2');
+            if (editor2) {
+                let saveTimeout2;
+                editor2.addEventListener('input', () => {
+                    clearTimeout(saveTimeout2);
+                    saveTimeout2 = setTimeout(() => {
+                        this.saveCurrentContent2();
                         this.updateOutput();
                     }, 500);
                 });
