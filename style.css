@@ -470,6 +470,37 @@ body {
     color: #ef4444;
 }
 
+/* Split-view tab indicators */
+.tab.panel-1::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: rgba(100, 200, 255, 0.3);
+    border-radius: 6px 0 0 0;
+}
+
+.tab.panel-2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: rgba(255, 150, 100, 0.3);
+    border-radius: 6px 0 0 0;
+}
+
+.tab.active.panel-1::before {
+    background: rgba(100, 200, 255, 0.8);
+}
+
+.tab.active.panel-2::before {
+    background: rgba(255, 150, 100, 0.8);
+}
+
 .popout-btn {
     display: flex;
     align-items: center;
@@ -1047,6 +1078,35 @@ body {
     background: var(--bg-elevated);
     color: var(--text-primary);
     border: 1px solid var(--border-subtle);
+}
+
+/* Split-view file-item indicators */
+.file-item.active-panel-1::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: rgba(100, 200, 255, 0.8);
+    border-radius: 50%;
+}
+
+.file-item.active-panel-2::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 150, 100, 0.8);
+    border-radius: 50%;
+}
+
+.file-item.active-panel-1.active-panel-2::after {
+    background: linear-gradient(90deg, rgba(100, 200, 255, 0.8) 50%, rgba(255, 150, 100, 0.8) 50%);
 }
 
 .file-item svg,

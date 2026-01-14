@@ -1923,7 +1923,20 @@ $('#toggler').on('click', function(){
                 if (!file) return;
 
                 const tab = document.createElement('div');
-                tab.className = 'tab' + (this.activeTab === fileId ? ' active' : '');
+                let isActive = false;
+                let isInPanel2 = false;
+
+                if (this.splitMode) {
+                    // In split mode, check which panel this tab is in
+                    isActive = this.activeTab1 === fileId || this.activeTab2 === fileId;
+                    isInPanel2 = this.activeTab2 === fileId;
+                    tab.className = 'tab' + (isActive ? ' active' : '') + (isInPanel2 ? ' panel-2' : ' panel-1');
+                    tab.setAttribute('data-panel', isInPanel2 ? '2' : '1');
+                } else {
+                    // In single mode, regular active state
+                    isActive = this.activeTab === fileId;
+                    tab.className = 'tab' + (isActive ? ' active' : '');
+                }
 
                 const icon = this.getFileIcon(file.type);
 
@@ -1939,7 +1952,12 @@ $('#toggler').on('click', function(){
 
                 tab.addEventListener('click', (e) => {
                     if (!e.target.closest('.tab-close')) {
-                        this.switchToTab(fileId);
+                        if (this.splitMode) {
+                            const targetPanel = tab.getAttribute('data-panel') === '2' ? 2 : 1;
+                            this.switchToTabInPanel(fileId, targetPanel);
+                        } else {
+                            this.switchToTab(fileId);
+                        }
                     }
                 });
 
@@ -1948,6 +1966,16 @@ $('#toggler').on('click', function(){
                     e.stopPropagation();
                     this.closeTab(fileId);
                 });
+
+                // Add right-click context menu to switch panel in split mode
+                if (this.splitMode) {
+                    tab.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        const currentPanel = tab.getAttribute('data-panel');
+                        const newPanel = currentPanel === '1' ? 2 : 1;
+                        this.switchToTabInPanel(fileId, newPanel);
+                    });
+                }
 
                 container.appendChild(tab);
             });
@@ -2010,7 +2038,17 @@ $('#toggler').on('click', function(){
                     .filter(file => file.folderId === parentId)
                     .forEach(file => {
                         const fileItem = document.createElement('div');
-                        fileItem.className = 'file-item' + (this.activeTab === file.id ? ' active' : '');
+                        let fileItemClass = 'file-item';
+                        
+                        if (this.splitMode) {
+                            if (this.activeTab1 === file.id) fileItemClass += ' active-panel-1';
+                            if (this.activeTab2 === file.id) fileItemClass += ' active-panel-2';
+                            if (this.activeTab1 === file.id || this.activeTab2 === file.id) fileItemClass += ' active';
+                        } else {
+                            if (this.activeTab === file.id) fileItemClass += ' active';
+                        }
+                        
+                        fileItem.className = fileItemClass;
                         fileItem.style.paddingLeft = `${(level * 16) + 16}px`;
 
                         const icon = this.getFileIcon(file.type);
