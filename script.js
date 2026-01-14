@@ -1965,6 +1965,15 @@ $('#toggler').on('click', function(){
                 });
             }
 
+            // File toggle button in tab bar
+            const fileToggleBtn = document.getElementById('file-toggle-btn');
+            if (fileToggleBtn) {
+                fileToggleBtn.addEventListener('click', () => {
+                    const explorer = document.getElementById('file-explorer');
+                    explorer.classList.toggle('collapsed');
+                });
+            }
+
             // Pop-out output button
             const popoutBtn = document.getElementById('popout-output-btn');
             if (popoutBtn) {

@@ -609,6 +609,27 @@ body {
     flex-direction: column;
 }
 
+/* When wrapper is toggled (vertical layout), file explorer should overlay when collapsed */
+.wrapperToggled .file-explorer {
+    width: 100%;
+    max-width: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border-medium);
+    position: relative;
+}
+
+.wrapperToggled .file-explorer.collapsed {
+    width: 0;
+    min-width: 0;
+    height: 0;
+    border-bottom: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    overflow: hidden;
+}
+
 @media (max-width: 600px) {
     .contentWrapper {
         width: 100vw;
@@ -721,7 +742,7 @@ body {
     overflow: hidden;
 }
 
-/* On desktop, collapsed state just shrinks the width */
+/* On desktop, collapsed state uses position absolute overlay */
 @media (min-width: 601px) {
     .file-explorer.collapsed {
         width: 0;
@@ -729,6 +750,10 @@ body {
         display: flex;
         border-right: none;
         overflow: hidden;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: -1;
     }
 }
 
@@ -1550,7 +1575,35 @@ body {
     #mobile-file-toggle:active {
         opacity: 0.7;
     }
-}
+    }
+
+    /* File explorer toggle button in tab bar */
+    #file-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 8px;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        border-radius: 6px;
+        transition: var(--transition-smooth);
+        min-height: 44px;
+        min-width: 44px;
+        flex-shrink: 0;
+    }
+
+    #file-toggle-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+    }
+
+    #file-toggle-btn:active {
+        opacity: 0.7;
+    }
 
 /* ============================================
    Library Import Modal
