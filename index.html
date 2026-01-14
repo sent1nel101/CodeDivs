@@ -272,17 +272,42 @@
       </div>
     </div>
 
-    <!-- Unified Editor Area -->
+    <!-- Unified Editor Area with Split Support -->
     <div class="editor-container" id="editor-container">
-      <button class="format-btn" id="format-current"
-        title="Format Code (Ctrl+Shift+F)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
-          <path d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
-        Format
-      </button>
-      <textarea id="unified-editor" class="text-area"></textarea>
+      <!-- Editor Header with Controls -->
+      <div class="editor-header">
+        <button class="format-btn" id="format-current"
+          title="Format Code (Ctrl+Shift+F)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+          Format
+        </button>
+        <button class="split-toggle-btn" id="split-toggle-btn"
+          title="Toggle split view">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M8 19H5c-1 0-2-1-2-2V7c0-1 1-2 2-2h3M16 5h3c1 0 2 1 2 2v10c0 1-1 2-2 2h-3M12 4v16"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Dual Editor Panels -->
+      <div class="editor-panels-wrapper" id="editor-panels-wrapper">
+        <!-- Panel 1 -->
+        <div class="editor-panel" id="editor-panel-1">
+          <textarea id="unified-editor" class="text-area"></textarea>
+        </div>
+
+        <!-- Resizable Divider -->
+        <div class="editor-divider" id="editor-divider"></div>
+
+        <!-- Panel 2 (hidden by default) -->
+        <div class="editor-panel" id="editor-panel-2" style="display: none;">
+          <textarea id="unified-editor-2" class="text-area"></textarea>
+        </div>
+      </div>
     </div>
 
     <!-- Output Panel -->
