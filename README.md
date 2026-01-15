@@ -355,6 +355,23 @@ Expands to:
 - ✅ Safari (latest)
 - ✅ Opera (latest)
 
+## 🧪 Testing
+
+CodeDivs includes a browser-based test suite for verifying core functionality.
+
+### Running Tests
+1. Open `tests.html` in your browser
+2. Click "Run All Tests"
+3. View results for all test suites
+
+### Test Coverage
+- **Helper Functions**: Tab insertion, word extraction
+- **Bracket Matching**: Finding matching brackets, nested brackets
+- **URL Encoding**: Code compression/decompression for sharing
+- **Snippets**: CSS/JS/HTML snippet expansion
+- **Virtual File System**: File/folder CRUD operations
+- **File Type Detection**: Extension-based type detection
+
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to:

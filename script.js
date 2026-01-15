@@ -1,11 +1,21 @@
- // emmet trial - will be scoped to HTML editor only
- emmet.require('textarea').setup({
-    pretty_break: true, // enable formatted line breaks (when inserting 
-                        // between opening and closing tag) 
-    use_tab: true       // expand abbreviations by Tab key
+/**
+ * CodeDivs - Browser-Based Code Sandbox
+ * @fileoverview Main JavaScript file for CodeDivs application.
+ * Provides a virtual file system, code editing with snippets/autocomplete,
+ * live preview, and export functionality.
+ * @version 3.0
+ */
+
+// Initialize Emmet for HTML abbreviation expansion
+emmet.require('textarea').setup({
+    pretty_break: true,
+    use_tab: true
 });
 
-// Helper function to insert tab character in textareas
+/**
+ * Inserts a tab character at the current cursor position.
+ * @param {HTMLTextAreaElement} textarea - The textarea element
+ */
 function insertTab(textarea) {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -13,7 +23,11 @@ function insertTab(textarea) {
     textarea.selectionStart = textarea.selectionEnd = start + 1;
 }
 
-// Helper function to remove indentation (outdent)
+/**
+ * Removes one level of indentation from the current line.
+ * Handles both tab characters and 2-4 space indentation.
+ * @param {HTMLTextAreaElement} textarea - The textarea element
+ */
 function removeTab(textarea) {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -44,7 +58,11 @@ function removeTab(textarea) {
     }
 }
 
-// Snippet expansion function
+/**
+ * Attempts to expand a snippet trigger at the current cursor position.
+ * @param {HTMLTextAreaElement} textarea - The textarea with snippets attached
+ * @returns {boolean} True if a snippet was expanded, false otherwise
+ */
 function tryExpandSnippet(textarea) {
     if (!textarea.snippets) return false;
     
@@ -107,7 +125,7 @@ function setupUndoRedo(textarea) {
     
     // Save state on input with debouncing
     let saveTimeout;
-    textarea.addEventListener('input', function(e) {
+    textarea.addEventListener('input', function() {
         if (history.isUndoing) return;
         
         clearTimeout(saveTimeout);
@@ -196,73 +214,75 @@ function setupUndoRedo(textarea) {
     textarea.undoRedoHistory = history;
 }
 
-// Enhanced bracket highlighting with matching visualization
+/**
+ * Sets up bracket highlighting for a textarea element.
+ * Highlights matching brackets when cursor is near them.
+ * @param {HTMLTextAreaElement} textarea - The textarea to enable bracket highlighting on
+ */
 function highlightBrackets(textarea) {
-    const openBrackets = ['(', '[', '{'];
-    const closeBrackets = [')', ']', '}'];
-    const bracketPairs = {'(': ')', '[': ']', '{': '}'};
-    const reversePairs = {')': '(', ']': '[', '}': '{'};
-    
-    textarea.addEventListener('keyup', function(e) {
-        const pos = this.selectionStart;
-        showBracketMatch(this, pos);
+    textarea.addEventListener('keyup', function() {
+        showBracketMatch(this, this.selectionStart);
     });
-    
-    textarea.addEventListener('click', function(e) {
-        const pos = this.selectionStart;
-        showBracketMatch(this, pos);
+
+    textarea.addEventListener('click', function() {
+        showBracketMatch(this, this.selectionStart);
     });
-    
-    textarea.addEventListener('selectionchange', function(e) {
+
+    textarea.addEventListener('selectionchange', function() {
         if (document.activeElement === this) {
             showBracketMatch(this, this.selectionStart);
         }
     });
 }
 
+/**
+ * Shows visual feedback when cursor is near a bracket with a matching pair.
+ * @param {HTMLTextAreaElement} textarea - The textarea element
+ * @param {number} pos - Current cursor position
+ */
 function showBracketMatch(textarea, pos) {
     const text = textarea.value;
     const charBefore = text[pos - 1];
     const charAt = text[pos];
-    
+
     const openBrackets = {'(': ')', '[': ']', '{': '}'};
     const closeBrackets = {')': '(', ']': '[', '}': '{'};
-    
-    let matchPos = -1;
-    let searchChar = null;
-    let isForward = false;
-    
+
     // Check if cursor is after an opening bracket or before a closing bracket
     if (openBrackets[charBefore]) {
-        searchChar = openBrackets[charBefore];
-        matchPos = findMatchingBracket(text, pos - 1, searchChar, true);
+        findMatchingBracket(text, pos - 1, openBrackets[charBefore], true);
         flashBracketHighlight(textarea);
     } else if (closeBrackets[charBefore]) {
-        searchChar = closeBrackets[charBefore];
-        matchPos = findMatchingBracket(text, pos - 1, searchChar, false);
+        findMatchingBracket(text, pos - 1, closeBrackets[charBefore], false);
         flashBracketHighlight(textarea);
     } else if (openBrackets[charAt]) {
-        searchChar = openBrackets[charAt];
-        matchPos = findMatchingBracket(text, pos, searchChar, true);
+        findMatchingBracket(text, pos, openBrackets[charAt], true);
         flashBracketHighlight(textarea);
     } else if (closeBrackets[charAt]) {
-        searchChar = closeBrackets[charAt];
-        matchPos = findMatchingBracket(text, pos, searchChar, false);
+        findMatchingBracket(text, pos, closeBrackets[charAt], false);
         flashBracketHighlight(textarea);
     }
 }
 
-function findMatchingBracket(text, startPos, matchChar, forward) {
+/**
+ * Finds the position of a matching bracket in the text.
+ * @param {string} text - The text content
+ * @param {number} startPos - Starting position of the bracket
+ * @param {string} _matchChar - Unused, kept for API compatibility
+ * @param {boolean} forward - Search direction (true = forward, false = backward)
+ * @returns {number} Position of matching bracket, or -1 if not found
+ */
+function findMatchingBracket(text, startPos, _matchChar, forward) {
     const openBrackets = {'(': ')', '[': ']', '{': '}'};
     const closeBrackets = {')': '(', ']': '[', '}': '{'};
-    
-    let currentChar = text[startPos];
+
+    const currentChar = text[startPos];
     let stack = 1;
     let i = forward ? startPos + 1 : startPos - 1;
-    
+
     while (forward ? i < text.length : i >= 0) {
         const char = text[i];
-        
+
         if (forward) {
             if (openBrackets[currentChar] === char) {
                 stack--;
@@ -278,10 +298,10 @@ function findMatchingBracket(text, startPos, matchChar, forward) {
                 stack++;
             }
         }
-        
+
         i = forward ? i + 1 : i - 1;
     }
-    
+
     return -1;
 }
 
@@ -614,10 +634,15 @@ function createAutocompleteDropdown() {
     return dropdown;
 }
 
-function showAutocomplete(textarea, suggestions, cursorPos) {
+/**
+ * Shows the autocomplete dropdown with filtered suggestions.
+ * @param {HTMLTextAreaElement} textarea - The textarea element
+ * @param {string[]} suggestions - Array of suggestion strings
+ */
+function showAutocomplete(textarea, suggestions) {
     const dropdown = document.getElementById('autocomplete-dropdown') || createAutocompleteDropdown();
     const rect = textarea.getBoundingClientRect();
-    
+
     // Track which editor owns this dropdown to prevent cross-editor interference
     if (dropdown.dataset.owner && dropdown.dataset.owner !== textarea.id) {
         dropdown.style.display = 'none';
@@ -638,7 +663,7 @@ function showAutocomplete(textarea, suggestions, cursorPos) {
     }
     
     dropdown.innerHTML = '';
-    filtered.slice(0, 8).forEach((suggestion, index) => {
+    filtered.slice(0, 8).forEach((suggestion) => {
         const item = document.createElement('div');
         item.textContent = suggestion;
         item.style.cssText = `
@@ -704,7 +729,7 @@ function setupAutocomplete(textarea, suggestions, isHtmlEditor = false, snippets
                 return;
             }
         }
-        showAutocomplete(this, suggestions, this.selectionStart);
+        showAutocomplete(this, suggestions);
     });
     
     textarea.addEventListener('blur', function() {
@@ -802,7 +827,7 @@ $('#toggler').on('click', function(){
         // Listen for system theme changes (for auto mode)
         if (window.matchMedia) {
             const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            darkModeQuery.addListener(function() {
+            darkModeQuery.addEventListener('change', function() {
                 const currentTheme = localStorage.getItem('codedivs-theme') || 'auto';
                 if (currentTheme === 'auto') {
                     applyTheme('auto');
@@ -1199,7 +1224,6 @@ $('#toggler').on('click', function(){
     // ============================================
     const exportBtn = document.getElementById('exportBtn');
     const exportDropdown = document.querySelector('.export-dropdown');
-    const exportMenu = document.getElementById('exportMenu');
 
     // Toggle dropdown
     exportBtn.addEventListener('click', function(e) {
@@ -1336,18 +1360,27 @@ $('#toggler').on('click', function(){
     const copyUrlBtn = document.getElementById('copy-url-btn');
     const copySuccess = document.getElementById('copy-success');
 
-    // Compress and encode code to URL hash
+    /**
+     * Compresses code object to URL-safe base64 string.
+     * @param {Object} code - Object with html, css, js properties
+     * @returns {string} URL-safe base64 encoded string
+     */
     const compressToURL = (code) => {
         const json = JSON.stringify(code);
-        // Use base64 encoding with URL-safe characters
-        const encoded = btoa(unescape(encodeURIComponent(json)))
+        // Convert to base64 with URL-safe characters
+        const bytes = new TextEncoder().encode(json);
+        const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('');
+        return btoa(binString)
             .replace(/\+/g, '-')
             .replace(/\//g, '_')
             .replace(/=+$/, '');
-        return encoded;
     };
 
-    // Decompress from URL hash
+    /**
+     * Decompresses URL-safe base64 string back to code object.
+     * @param {string} encoded - URL-safe base64 encoded string
+     * @returns {Object|null} Decoded code object or null on failure
+     */
     const decompressFromURL = (encoded) => {
         try {
             // Restore base64 padding and characters
@@ -1357,7 +1390,9 @@ $('#toggler').on('click', function(){
             const padding = base64.length % 4;
             const padded = padding ? base64 + '='.repeat(4 - padding) : base64;
 
-            const json = decodeURIComponent(escape(atob(padded)));
+            const binString = atob(padded);
+            const bytes = Uint8Array.from(binString, (char) => char.codePointAt(0));
+            const json = new TextDecoder().decode(bytes);
             return JSON.parse(json);
         } catch (e) {
             console.error('Failed to decompress code:', e);
@@ -1390,12 +1425,13 @@ $('#toggler').on('click', function(){
         }
     };
 
-    // Generate shareable URL
+    /**
+     * Generates a shareable URL with the current code embedded.
+     * @returns {string} Complete shareable URL
+     */
     const generateShareURL = () => {
-        const code = getCode();
-        const compressed = compressToURL(code);
-        const url = window.location.origin + window.location.pathname + '#' + compressed;
-        return url;
+        const compressed = compressToURL(getCode());
+        return window.location.origin + window.location.pathname + '#' + compressed;
     };
 
     // Open share modal
@@ -1466,8 +1502,8 @@ $('#toggler').on('click', function(){
         splitOrientation: 'horizontal', // 'horizontal' or 'vertical'
         activeTab1: null,
         activeTab2: null,
-        panelWidths: { panel1: 50, panel2: 50 }, // percentages for horizontal
-        panelHeights: { panel1: 50, panel2: 50 }, // percentages for vertical
+        panelWidths: { panel1: 1, panel2: 1 }, // fr units for horizontal (1:1 ratio = 50/50)
+        panelHeights: { panel1: 1, panel2: 1 }, // fr units for vertical (1:1 ratio = 50/50)
 
         init() {
             // Start with editor disabled
@@ -1486,20 +1522,42 @@ $('#toggler').on('click', function(){
                 this.createFile('script.js', 'javascript', '// enter your JS code here =)');
             }
 
-            // Open tabs or first file
-            if (this.openTabs.length > 0) {
+            // Open saved tabs or first file
+            if (this.openTabs.length === 2) {
+                // Restore dual-panel mode
+                this.enableSplitMode();
                 this.renderTabs();
-                if (this.activeTab) {
-                    this.switchToTab(this.activeTab);
-                }
+                
+                // Restore UI toggle button state to match orientation
+                this.restoreOrientationUI();
+            } else if (this.openTabs.length === 1) {
+                // Single file
+                this.activeTab = this.openTabs[0];
+                this.loadFileContent(this.activeTab);
+                this.renderTabs();
             } else if (Object.keys(this.files).length > 0) {
+                // No tabs open, open first file
                 const firstFileId = Object.keys(this.files)[0];
                 this.openTab(firstFileId);
             }
         },
 
+        restoreOrientationUI() {
+            // Sync the toggle button UI with saved orientation state
+            const contentWrapper = document.querySelector('.contentWrapper');
+            const toggler = document.getElementById('toggler');
+            
+            if (this.splitOrientation === 'vertical') {
+                if (contentWrapper) contentWrapper.classList.add('wrapperToggled');
+                if (toggler) toggler.classList.add('toggled');
+            } else {
+                if (contentWrapper) contentWrapper.classList.remove('wrapperToggled');
+                if (toggler) toggler.classList.remove('toggled');
+            }
+        },
+
         createFile(name, type, content = '', folderId = null) {
-            const id = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const id = Date.now() + '_' + Math.random().toString(36).substring(2, 11);
             this.files[id] = {
                 id,
                 name,
@@ -1514,7 +1572,7 @@ $('#toggler').on('click', function(){
         },
 
         createFolder(name, parentId = null) {
-            const id = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const id = Date.now() + '_' + Math.random().toString(36).substring(2, 11);
             this.folders[id] = {
                 id,
                 name,
@@ -1549,30 +1607,29 @@ $('#toggler').on('click', function(){
             const hasFiles = Object.values(this.files).some(file => file.folderId === id);
             const hasSubfolders = Object.values(this.folders).some(folder => folder.parentId === id);
 
-            if (hasFiles || hasSubfolders) {
-                if (!confirm(`Folder "${this.folders[id].name}" is not empty. Delete it and all its contents?`)) {
-                    return;
-                }
+            // Confirm deletion based on whether folder has contents
+            const confirmMessage = (hasFiles || hasSubfolders)
+                ? `Folder "${this.folders[id].name}" is not empty. Delete it and all its contents?`
+                : `Delete folder "${this.folders[id].name}"?`;
 
-                // Delete all files in folder
-                Object.keys(this.files).forEach(fileId => {
-                    if (this.files[fileId].folderId === id) {
-                        this.closeTab(fileId);
-                        delete this.files[fileId];
-                    }
-                });
-
-                // Delete all subfolders recursively
-                Object.keys(this.folders).forEach(folderId => {
-                    if (this.folders[folderId].parentId === id) {
-                        this.deleteFolder(folderId);
-                    }
-                });
-            } else {
-                if (!confirm(`Delete folder "${this.folders[id].name}"?`)) {
-                    return;
-                }
+            if (!confirm(confirmMessage)) {
+                return;
             }
+
+            // Delete all files in folder
+            Object.keys(this.files).forEach(fileId => {
+                if (this.files[fileId].folderId === id) {
+                    this.closeTab(fileId);
+                    delete this.files[fileId];
+                }
+            });
+
+            // Delete all subfolders recursively
+            Object.keys(this.folders).forEach(folderId => {
+                if (this.folders[folderId].parentId === id) {
+                    this.deleteFolder(folderId);
+                }
+            });
 
             delete this.folders[id];
             delete this.collapsedFolders[id];
@@ -1586,16 +1643,29 @@ $('#toggler').on('click', function(){
 
             // Check if already open
             if (this.openTabs.includes(fileId)) {
-                this.switchToTab(fileId);
+                return; // Already open, no action needed
+            }
+
+            // Cap at 2 files max
+            if (this.openTabs.length >= 2) {
+                alert('Maximum 2 files can be open at once. Close a file to open another.');
                 return;
             }
 
             // Add to open tabs
             this.openTabs.push(fileId);
-            this.activeTab = fileId;
+            
+            // Auto-enable split mode if 2 files now open
+            if (this.openTabs.length === 2) {
+                this.enableSplitMode();
+            } else {
+                // Single file - ensure single mode
+                this.disableSplitMode();
+                this.activeTab = fileId;
+                this.loadFileContent(fileId);
+            }
 
             this.renderTabs();
-            this.loadFileContent(fileId);
             this.saveTabsToStorage();
         },
 
@@ -1604,177 +1674,120 @@ $('#toggler').on('click', function(){
             if (index === -1) return;
 
             // Save current content before closing
-            if (this.splitMode) {
-                if (this.activeTab1 === fileId) {
-                    this.saveCurrentContent();
-                }
-                if (this.activeTab2 === fileId) {
-                    this.saveCurrentContent2();
-                }
-            } else {
-                if (this.activeTab === fileId) {
-                    this.saveCurrentContent();
-                }
+            if (this.activeTab === fileId) {
+                this.saveCurrentContent();
+            }
+            if (this.activeTab1 === fileId) {
+                this.saveCurrentContent();
+            }
+            if (this.activeTab2 === fileId) {
+                this.saveCurrentContent2();
             }
 
             // Remove from open tabs
             this.openTabs.splice(index, 1);
 
-            // Handle split mode tab switching
-            if (this.splitMode) {
-                // If closing tab in panel 1
-                if (this.activeTab1 === fileId) {
-                    if (this.openTabs.length > 0) {
-                        const newTab = this.openTabs[Math.max(0, index - 1)];
-                        if (newTab !== this.activeTab2) {
-                            this.activeTab1 = newTab;
-                            this.loadFileContentInPanel(newTab, 1);
-                        } else {
-                            this.activeTab1 = null;
-                        }
-                    } else {
-                        this.activeTab1 = null;
-                    }
-                }
-                // If closing tab in panel 2
-                if (this.activeTab2 === fileId) {
-                    if (this.openTabs.length > 0) {
-                        const newTab = this.openTabs[Math.max(0, index - 1)];
-                        if (newTab !== this.activeTab1) {
-                            this.activeTab2 = newTab;
-                            this.loadFileContentInPanel(newTab, 2);
-                        } else {
-                            this.activeTab2 = null;
-                        }
-                    } else {
-                        this.activeTab2 = null;
-                    }
-                }
-            } else {
-                // Single mode - switch to another tab or disable editor
-                if (this.activeTab === fileId) {
-                    if (this.openTabs.length > 0) {
-                        const newActiveIndex = Math.max(0, index - 1);
-                        this.switchToTab(this.openTabs[newActiveIndex]);
-                    } else {
-                        this.activeTab = null;
-                        this.disableEditor();
-                    }
-                }
+            // If only 1 file left, auto-disable split mode
+            if (this.openTabs.length === 1) {
+                this.disableSplitMode();
+                this.activeTab = this.openTabs[0];
+                this.loadFileContent(this.activeTab);
+            } else if (this.openTabs.length === 0) {
+                // No files open
+                this.disableSplitMode();
+                this.activeTab = null;
+                this.disableEditor();
             }
+            // If 2 files still open, split mode stays active (no action needed)
 
             this.renderTabs();
             this.saveTabsToStorage();
         },
 
-        switchToTab(fileId, targetPanel = 1) {
+        switchToTab(fileId) {
             if (!this.files[fileId]) return;
+            if (!this.openTabs.includes(fileId)) return;
 
-            if (this.splitMode) {
-                // In split mode, switch specific panel
-                this.switchToTabInPanel(fileId, targetPanel);
-            } else {
-                // Normal single-panel mode
-                // Save current tab content
-                if (this.activeTab && this.activeTab !== fileId) {
-                    this.saveCurrentContent();
-                }
-
-                this.activeTab = fileId;
-                this.loadFileContent(fileId);
-                this.renderTabs();
-                this.renderFileTree();
-                this.saveTabsToStorage();
-            }
-        },
-
-        switchToTabInPanel(fileId, panelNumber = 1) {
-            if (!this.files[fileId]) return;
-
-            if (panelNumber === 2) {
-                if (this.activeTab2 && this.activeTab2 !== fileId) {
-                    this.saveCurrentContent2();
-                }
-                this.activeTab2 = fileId;
-                this.loadFileContentInPanel(fileId, 2);
-            } else {
-                if (this.activeTab1 && this.activeTab1 !== fileId) {
-                    this.saveCurrentContent();
-                }
-                this.activeTab1 = fileId;
-                this.loadFileContentInPanel(fileId, 1);
+            // In single mode
+            if (this.activeTab && this.activeTab !== fileId) {
+                this.saveCurrentContent();
             }
 
+            this.activeTab = fileId;
+            this.loadFileContent(fileId);
             this.renderTabs();
             this.renderFileTree();
-            this.saveTabsToStorage();
         },
 
-        toggleSplitView() {
-            // Prevent split view on mobile (< 600px)
-            if (window.innerWidth < 600) {
-                alert('Split view is not available on mobile devices. Please use a larger screen.');
-                return;
-            }
+        enableSplitMode() {
+            if (this.splitMode) return; // Already enabled
+            if (this.openTabs.length < 2) return; // Need 2 files
 
-            this.splitMode = !this.splitMode;
+            this.splitMode = true;
+            this.activeTab1 = this.openTabs[0];
+            this.activeTab2 = this.openTabs[1];
 
-            if (this.splitMode) {
-                // Enable split view
-                const panel2 = document.getElementById('editor-panel-2');
-                const wrapper = document.getElementById('editor-panels-wrapper');
-                const divider = document.getElementById('editor-divider');
+            // Show panels
+            const panel2 = document.getElementById('editor-panel-2');
+            const wrapper = document.getElementById('editor-panels-wrapper');
+            const divider = document.getElementById('editor-divider');
 
+            if (panel2 && wrapper && divider) {
                 panel2.style.display = 'flex';
                 wrapper.classList.add('split-' + this.splitOrientation);
                 divider.style.display = 'block';
 
-                // Set up second panel with a different tab if available
-                if (this.openTabs.length > 1) {
-                    this.activeTab2 = this.openTabs[1];
-                    this.loadFileContentInPanel(this.openTabs[1], 2);
-                } else if (this.openTabs.length === 1) {
-                    this.activeTab2 = this.openTabs[0];
-                    this.loadFileContentInPanel(this.openTabs[0], 2);
-                }
+                // Load content into both panels
+                this.loadFileContentInPanel(this.activeTab1, 1);
+                this.loadFileContentInPanel(this.activeTab2, 2);
 
-                // Store active tabs from single mode
-                this.activeTab1 = this.activeTab;
-
-                // Update button state
+                // Update UI
                 const toggleBtn = document.getElementById('split-toggle-btn');
                 if (toggleBtn) {
                     toggleBtn.classList.add('active');
                 }
 
-                // Apply saved panel sizes
                 this.applyPanelSizes();
-            } else {
-                // Disable split view
-                const panel2 = document.getElementById('editor-panel-2');
-                const wrapper = document.getElementById('editor-panels-wrapper');
-                const divider = document.getElementById('editor-divider');
+                this.setupResizableDivider();
+            }
 
+            // Always save state even if DOM not ready
+            this.saveSplitViewState();
+            this.saveTabsToStorage();
+        },
+
+        disableSplitMode() {
+            if (!this.splitMode) return; // Already disabled
+
+            this.splitMode = false;
+
+            // Hide panels
+            const panel2 = document.getElementById('editor-panel-2');
+            const wrapper = document.getElementById('editor-panels-wrapper');
+            const divider = document.getElementById('editor-divider');
+
+            if (panel2 && wrapper && divider) {
                 panel2.style.display = 'none';
                 wrapper.classList.remove('split-horizontal', 'split-vertical');
                 divider.style.display = 'none';
+                
+                // Clear grid template styles to reset to single panel
+                wrapper.style.gridTemplateColumns = '';
+                wrapper.style.gridTemplateRows = '';
 
-                // Return to single-panel mode with first tab
-                this.activeTab = this.activeTab1 || this.openTabs[0];
-                if (this.activeTab) {
-                    this.loadFileContent(this.activeTab);
-                }
-
-                // Update button state
+                // Update UI
                 const toggleBtn = document.getElementById('split-toggle-btn');
                 if (toggleBtn) {
                     toggleBtn.classList.remove('active');
                 }
             }
 
-            this.renderTabs();
-            this.renderFileTree();
+            this.activeTab1 = null;
+            this.activeTab2 = null;
+
+            // Always save state
             this.saveSplitViewState();
+            this.saveTabsToStorage();
         },
 
         setupResizableDivider() {
@@ -1785,13 +1798,18 @@ $('#toggler').on('click', function(){
 
             if (!divider || !panel1 || !panel2) return;
 
+            // Clone divider to remove old event listeners
+            const newDivider = divider.cloneNode(true);
+            divider.replaceWith(newDivider);
+            const dividerEl = newDivider;
+
             let isResizing = false;
             let startX = 0;
             let startY = 0;
             let startWidth1 = 0;
             let startHeight1 = 0;
 
-            divider.addEventListener('mousedown', (e) => {
+            dividerEl.addEventListener('mousedown', (e) => {
                 isResizing = true;
                 startX = e.clientX;
                 startY = e.clientY;
@@ -1799,6 +1817,9 @@ $('#toggler').on('click', function(){
                 // Get initial sizes
                 startWidth1 = panel1.offsetWidth;
                 startHeight1 = panel1.offsetHeight;
+
+                // Add resizing class to prevent text selection
+                document.body.classList.add('resizing-divider');
 
                 document.addEventListener('mousemove', handleMouseMove);
                 document.addEventListener('mouseup', handleMouseUp);
@@ -1813,42 +1834,47 @@ $('#toggler').on('click', function(){
                     const deltaX = e.clientX - startX;
                     const totalWidth = wrapper.offsetWidth;
                     const newWidth1 = startWidth1 + deltaX;
-                    const percentage1 = (newWidth1 / totalWidth) * 100;
+                    const ratio1 = newWidth1 / totalWidth;
 
-                    // Clamp between 20% and 80%
-                    const clampedPercentage = Math.max(20, Math.min(80, percentage1));
+                    // Clamp between 0.2 and 0.8 (20% and 80%)
+                    const clampedRatio1 = Math.max(0.2, Math.min(0.8, ratio1));
+                    const ratio2 = 1 - clampedRatio1;
 
-                    panel1.style.width = clampedPercentage + '%';
-                    panel2.style.width = (100 - clampedPercentage) + '%';
-
-                    // Update state
+                    // Store as fr units (proportional)
                     this.panelWidths = {
-                        panel1: clampedPercentage,
-                        panel2: 100 - clampedPercentage
+                        panel1: clampedRatio1,
+                        panel2: ratio2
                     };
+
+                    // Apply to grid
+                    wrapper.style.gridTemplateColumns = 
+                        clampedRatio1 + 'fr auto ' + ratio2 + 'fr';
                 } else {
                     // Vertical split (stacked)
                     const deltaY = e.clientY - startY;
                     const totalHeight = wrapper.offsetHeight;
                     const newHeight1 = startHeight1 + deltaY;
-                    const percentage1 = (newHeight1 / totalHeight) * 100;
+                    const ratio1 = newHeight1 / totalHeight;
 
-                    // Clamp between 20% and 80%
-                    const clampedPercentage = Math.max(20, Math.min(80, percentage1));
+                    // Clamp between 0.2 and 0.8 (20% and 80%)
+                    const clampedRatio1 = Math.max(0.2, Math.min(0.8, ratio1));
+                    const ratio2 = 1 - clampedRatio1;
 
-                    panel1.style.height = clampedPercentage + '%';
-                    panel2.style.height = (100 - clampedPercentage) + '%';
-
-                    // Update state
+                    // Store as fr units (proportional)
                     this.panelHeights = {
-                        panel1: clampedPercentage,
-                        panel2: 100 - clampedPercentage
+                        panel1: clampedRatio1,
+                        panel2: ratio2
                     };
+
+                    // Apply to grid
+                    wrapper.style.gridTemplateRows = 
+                        clampedRatio1 + 'fr auto ' + ratio2 + 'fr';
                 }
             };
 
             const handleMouseUp = () => {
                 isResizing = false;
+                document.body.classList.remove('resizing-divider');
                 document.removeEventListener('mousemove', handleMouseMove);
                 document.removeEventListener('mouseup', handleMouseUp);
                 this.saveSplitViewState();
@@ -1856,17 +1882,21 @@ $('#toggler').on('click', function(){
         },
 
         applyPanelSizes() {
-            const panel1 = document.getElementById('editor-panel-1');
-            const panel2 = document.getElementById('editor-panel-2');
-
-            if (!panel1 || !panel2) return;
+            const wrapper = document.getElementById('editor-panels-wrapper');
+            if (!wrapper) return;
 
             if (this.splitOrientation === 'horizontal') {
-                panel1.style.width = this.panelWidths.panel1 + '%';
-                panel2.style.width = this.panelWidths.panel2 + '%';
+                // Set grid columns: panel1_width divider panel2_width
+                wrapper.style.gridTemplateColumns = 
+                    this.panelWidths.panel1 + 'fr auto ' + this.panelWidths.panel2 + 'fr';
+                // Clear rows (let CSS class handle it)
+                wrapper.style.gridTemplateRows = '';
             } else {
-                panel1.style.height = this.panelHeights.panel1 + '%';
-                panel2.style.height = this.panelHeights.panel2 + '%';
+                // Set grid rows: panel1_height divider panel2_height
+                wrapper.style.gridTemplateRows = 
+                    this.panelHeights.panel1 + 'fr auto ' + this.panelHeights.panel2 + 'fr';
+                // Clear columns (let CSS class handle it)
+                wrapper.style.gridTemplateColumns = '';
             }
         },
 
@@ -1874,12 +1904,33 @@ $('#toggler').on('click', function(){
             const wrapper = document.getElementById('editor-panels-wrapper');
             if (!wrapper) return;
 
+            // Preserve the current split ratio when switching orientation
+            // splitOrientation has ALREADY been changed before this is called
+            // So get ratio from the OLD size that was just used
+            let ratio;
+            if (this.splitOrientation === 'vertical') {
+                // Just switched TO vertical, so was using panelWidths
+                ratio = this.panelWidths.panel1;
+            } else {
+                // Just switched TO horizontal, so was using panelHeights
+                ratio = this.panelHeights.panel1;
+            }
+
+            // Apply same ratio to both width and height for consistency
+            this.panelWidths.panel1 = ratio;
+            this.panelWidths.panel2 = 1 - ratio;
+            this.panelHeights.panel1 = ratio;
+            this.panelHeights.panel2 = 1 - ratio;
+
             // Update grid layout class
             wrapper.classList.remove('split-horizontal', 'split-vertical');
             wrapper.classList.add('split-' + this.splitOrientation);
 
-            // Apply panel sizes based on orientation
+            // Apply panel sizes based on new orientation
             this.applyPanelSizes();
+
+            // Re-setup divider for new orientation
+            this.setupResizableDivider();
 
             // Save state
             this.saveSplitViewState();
@@ -1953,12 +2004,32 @@ $('#toggler').on('click', function(){
             if (saved) {
                 try {
                     const state = JSON.parse(saved);
-                    this.splitMode = state.splitMode || false;
                     this.splitOrientation = state.splitOrientation || 'horizontal';
-                    this.activeTab1 = state.activeTab1 || null;
-                    this.activeTab2 = state.activeTab2 || null;
-                    this.panelWidths = state.panelWidths || { panel1: 50, panel2: 50 };
-                    this.panelHeights = state.panelHeights || { panel1: 50, panel2: 50 };
+                    
+                    // Load panel sizes, convert from old percentage format if needed
+                    if (state.panelWidths) {
+                        // If values are > 10, assume they're percentages (old format), convert to fr
+                        if (state.panelWidths.panel1 > 10) {
+                            this.panelWidths = {
+                                panel1: state.panelWidths.panel1 / 100,
+                                panel2: state.panelWidths.panel2 / 100
+                            };
+                        } else {
+                            this.panelWidths = state.panelWidths;
+                        }
+                    }
+                    
+                    if (state.panelHeights) {
+                        // If values are > 10, assume they're percentages (old format), convert to fr
+                        if (state.panelHeights.panel1 > 10) {
+                            this.panelHeights = {
+                                panel1: state.panelHeights.panel1 / 100,
+                                panel2: state.panelHeights.panel2 / 100
+                            };
+                        } else {
+                            this.panelHeights = state.panelHeights;
+                        }
+                    }
                 } catch (e) {
                     console.error('Failed to load split view state:', e);
                 }
@@ -2107,10 +2178,17 @@ $('#toggler').on('click', function(){
             if (saved) {
                 try {
                     const tabState = JSON.parse(saved);
-                    this.openTabs = tabState.openTabs || [];
-                    this.activeTab = tabState.activeTab || null;
+                    // Validate that all tabs still exist as files
+                    const validTabs = (tabState.openTabs || []).filter(tabId => this.files[tabId]);
+                    this.openTabs = validTabs;
+                    // Only restore activeTab if it exists
+                    if (tabState.activeTab && this.files[tabState.activeTab]) {
+                        this.activeTab = tabState.activeTab;
+                    }
                 } catch (e) {
                     console.error('Failed to load tabs:', e);
+                    this.openTabs = [];
+                    this.activeTab = null;
                 }
             }
         },
@@ -2119,26 +2197,24 @@ $('#toggler').on('click', function(){
             const container = document.getElementById('tabs-container');
             container.innerHTML = '';
 
-            this.openTabs.forEach(fileId => {
+            // In split mode with 2 files, show both tabs with panel indicators
+            // In single mode, show current tab as active
+            this.openTabs.forEach((fileId, index) => {
                 const file = this.files[fileId];
                 if (!file) return;
 
                 const tab = document.createElement('div');
-                let isActive = false;
-                let isInPanel2 = false;
+                const isActive = this.splitMode 
+                    ? (this.activeTab1 === fileId || this.activeTab2 === fileId)
+                    : (this.activeTab === fileId);
 
-                if (this.splitMode) {
-                    // In split mode, check which panel this tab is in
-                    isActive = this.activeTab1 === fileId || this.activeTab2 === fileId;
-                    isInPanel2 = this.activeTab2 === fileId;
-                    tab.className = 'tab' + (isActive ? ' active' : '') + (isInPanel2 ? ' panel-2' : ' panel-1');
-                    tab.setAttribute('data-panel', isInPanel2 ? '2' : '1');
-                } else {
-                    // In single mode, regular active state
-                    isActive = this.activeTab === fileId;
-                    tab.className = 'tab' + (isActive ? ' active' : '');
+                // Add panel indicator in split mode
+                let panelClass = '';
+                if (this.splitMode && this.openTabs.length === 2) {
+                    panelClass = index === 0 ? ' panel-1' : ' panel-2';
                 }
 
+                tab.className = 'tab' + (isActive ? ' active' : '') + panelClass;
                 const icon = this.getFileIcon(file.type);
 
                 tab.innerHTML = `
@@ -2151,32 +2227,21 @@ $('#toggler').on('click', function(){
                     </button>
                 `;
 
-                tab.addEventListener('click', (e) => {
-                    if (!e.target.closest('.tab-close')) {
-                        if (this.splitMode) {
-                            const targetPanel = tab.getAttribute('data-panel') === '2' ? 2 : 1;
-                            this.switchToTabInPanel(fileId, targetPanel);
-                        } else {
+                // Clicking tab does nothing in split mode (panel content is fixed)
+                // In single mode, tabs act as expected
+                if (!this.splitMode) {
+                    tab.addEventListener('click', (e) => {
+                        if (!e.target.closest('.tab-close')) {
                             this.switchToTab(fileId);
                         }
-                    }
-                });
+                    });
+                }
 
                 const closeBtn = tab.querySelector('.tab-close');
                 closeBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     this.closeTab(fileId);
                 });
-
-                // Add right-click context menu to switch panel in split mode
-                if (this.splitMode) {
-                    tab.addEventListener('contextmenu', (e) => {
-                        e.preventDefault();
-                        const currentPanel = tab.getAttribute('data-panel');
-                        const newPanel = currentPanel === '1' ? 2 : 1;
-                        this.switchToTabInPanel(fileId, newPanel);
-                    });
-                }
 
                 container.appendChild(tab);
             });
@@ -2245,8 +2310,8 @@ $('#toggler').on('click', function(){
                             if (this.activeTab1 === file.id) fileItemClass += ' active-panel-1';
                             if (this.activeTab2 === file.id) fileItemClass += ' active-panel-2';
                             if (this.activeTab1 === file.id || this.activeTab2 === file.id) fileItemClass += ' active';
-                        } else {
-                            if (this.activeTab === file.id) fileItemClass += ' active';
+                        } else if (this.activeTab === file.id) {
+                            fileItemClass += ' active';
                         }
                         
                         fileItem.className = fileItemClass;
@@ -2529,7 +2594,7 @@ $('#toggler').on('click', function(){
             const themeOptions = document.querySelectorAll('.drawer-item.theme-option');
             themeOptions.forEach(option => {
                 option.addEventListener('click', () => {
-                    const theme = option.dataset.theme;
+                    const { theme } = option.dataset;
                     const selector = document.getElementById('theme-selector');
                     if (selector) {
                         selector.value = theme;
@@ -2589,8 +2654,8 @@ $('#toggler').on('click', function(){
                 // Toggle on click
                 mobileFileToggle.addEventListener('click', () => {
                     fileExplorer.classList.toggle('collapsed');
-                    const isCollapsed = fileExplorer.classList.contains('collapsed');
-                    mobileFileToggle.setAttribute('aria-pressed', !isCollapsed ? 'true' : 'false');
+                    const isExpanded = !fileExplorer.classList.contains('collapsed');
+                    mobileFileToggle.setAttribute('aria-pressed', isExpanded ? 'true' : 'false');
                 });
             }
             

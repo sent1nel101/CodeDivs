@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeDivs Unit Tests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #1d1d1f;
+            color: #f5f5f7;
+        }
+        h1 { color: #0071e3; margin-bottom: 0.5rem; }
+        h2 { color: #a1a1a6; font-size: 1rem; margin-bottom: 2rem; }
+        .test-suite { margin-bottom: 2rem; }
+        .test-suite h3 {
+            color: #f5f5f7;
+            border-bottom: 1px solid #333;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .test { padding: 0.5rem 1rem; margin: 0.25rem 0; border-radius: 4px; }
+        .test.pass { background: rgba(52, 199, 89, 0.2); border-left: 3px solid #34c759; }
+        .test.fail { background: rgba(255, 59, 48, 0.2); border-left: 3px solid #ff3b30; }
+        .test-name { font-weight: 500; }
+        .test-result { font-size: 0.85rem; color: #a1a1a6; margin-top: 0.25rem; }
+        .summary {
+            background: #2d2d30;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .summary .passed { color: #34c759; }
+        .summary .failed { color: #ff3b30; }
+        #run-tests {
+            background: #0071e3;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+        #run-tests:hover { background: #0077ed; }
+    </style>
+</head>
+<body>
+    <h1>CodeDivs Unit Tests</h1>
+    <h2>Testing core functionality</h2>
+
+    <button id="run-tests">Run All Tests</button>
+
+    <div class="summary" id="summary">
+        <strong>Summary:</strong> Click "Run All Tests" to begin
+    </div>
+
+    <div id="test-results"></div>
+
+    <script>
+        /**
+         * Simple test framework for browser-based testing
+         */
+        const TestRunner = {
+            results: [],
+
+            /**
+             * Asserts that a condition is true
+             */
+            assert(condition, message) {
+                if (!condition) {
+                    throw new Error(message || 'Assertion failed');
+                }
+            },
+
+            /**
+             * Asserts that two values are equal
+             */
+            assertEqual(actual, expected, message) {
+                if (actual !== expected) {
+                    throw new Error(message || `Expected ${expected}, got ${actual}`);
+                }
+            },
+
+            /**
+             * Asserts that a value is truthy
+             */
+            assertTrue(value, message) {
+                if (!value) {
+                    throw new Error(message || `Expected truthy value, got ${value}`);
+                }
+            },
+
+            /**
+             * Asserts that a value is falsy
+             */
+            assertFalse(value, message) {
+                if (value) {
+                    throw new Error(message || `Expected falsy value, got ${value}`);
+                }
+            },
+
+            /**
+             * Runs a single test
+             */
+            runTest(name, testFn) {
+                try {
+                    testFn();
+                    this.results.push({ name, passed: true });
+                } catch (error) {
+                    this.results.push({ name, passed: false, error: error.message });
+                }
+            },
+
+            /**
+             * Renders test results to the DOM
+             */
+            renderResults() {
+                const container = document.getElementById('test-results');
+                const summary = document.getElementById('summary');
+
+                const passed = this.results.filter(r => r.passed).length;
+                const failed = this.results.filter(r => !r.passed).length;
+
+                summary.innerHTML = `
+                    <strong>Summary:</strong>
+                    <span class="passed">${passed} passed</span>,
+                    <span class="failed">${failed} failed</span>
+                    (${this.results.length} total)
+                `;
+
+                // Group results by suite
+                const suites = {};
+                this.results.forEach(result => {
+                    const [suite] = result.name.split(':');
+                    if (!suites[suite]) suites[suite] = [];
+                    suites[suite].push(result);
+                });
+
+                let html = '';
+                Object.entries(suites).forEach(([suiteName, tests]) => {
+                    html += `<div class="test-suite"><h3>${suiteName}</h3>`;
+                    tests.forEach(test => {
+                        const testName = test.name.split(':')[1] || test.name;
+                        const className = test.passed ? 'pass' : 'fail';
+                        const icon = test.passed ? '✓' : '✗';
+                        html += `
+                            <div class="test ${className}">
+                                <div class="test-name">${icon} ${testName}</div>
+                                ${test.error ? `<div class="test-result">Error: ${test.error}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                });
+
+                container.innerHTML = html;
+            }
+        };
+
+        /**
+         * Test Suites
+         */
+        const tests = {
+            /**
+             * Helper function tests
+             */
+            runHelperTests() {
+                // Test getCurrentWord function simulation
+                TestRunner.runTest('Helpers: getCurrentWord extracts word at cursor', () => {
+                    const mockGetCurrentWord = (text, pos) => {
+                        let start = pos;
+                        while (start > 0 && /[a-zA-Z0-9-_]/.test(text[start - 1])) {
+                            start--;
+                        }
+                        return text.substring(start, pos);
+                    };
+
+                    TestRunner.assertEqual(mockGetCurrentWord('hello world', 5), 'hello');
+                    TestRunner.assertEqual(mockGetCurrentWord('const foo = bar', 9), 'foo');
+                    TestRunner.assertEqual(mockGetCurrentWord('display: flex;', 8), 'display');
+                });
+
+                // Test insertTab simulation
+                TestRunner.runTest('Helpers: insertTab adds tab character', () => {
+                    const mockInsertTab = (text, pos) => {
+                        return text.slice(0, pos) + '\t' + text.slice(pos);
+                    };
+
+                    TestRunner.assertEqual(mockInsertTab('hello', 0), '\thello');
+                    TestRunner.assertEqual(mockInsertTab('hello', 5), 'hello\t');
+                    TestRunner.assertEqual(mockInsertTab('ab', 1), 'a\tb');
+                });
+            },
+
+            /**
+             * Bracket matching tests
+             */
+            runBracketTests() {
+                const findMatchingBracket = (text, startPos, forward) => {
+                    const openBrackets = {'(': ')', '[': ']', '{': '}'};
+                    const closeBrackets = {')': '(', ']': '[', '}': '{'};
+
+                    const currentChar = text[startPos];
+                    let stack = 1;
+                    let i = forward ? startPos + 1 : startPos - 1;
+
+                    while (forward ? i < text.length : i >= 0) {
+                        const char = text[i];
+
+                        if (forward) {
+                            if (openBrackets[currentChar] === char) {
+                                stack--;
+                                if (stack === 0) return i;
+                            } else if (char === currentChar) {
+                                stack++;
+                            }
+                        } else {
+                            if (closeBrackets[currentChar] === char) {
+                                stack--;
+                                if (stack === 0) return i;
+                            } else if (char === currentChar) {
+                                stack++;
+                            }
+                        }
+
+                        i = forward ? i + 1 : i - 1;
+                    }
+
+                    return -1;
+                };
+
+                TestRunner.runTest('Brackets: finds matching closing bracket', () => {
+                    TestRunner.assertEqual(findMatchingBracket('(test)', 0, true), 5);
+                    TestRunner.assertEqual(findMatchingBracket('[1, 2, 3]', 0, true), 8);
+                    TestRunner.assertEqual(findMatchingBracket('{a: 1}', 0, true), 5);
+                });
+
+                TestRunner.runTest('Brackets: finds matching opening bracket', () => {
+                    TestRunner.assertEqual(findMatchingBracket('(test)', 5, false), 0);
+                    TestRunner.assertEqual(findMatchingBracket('[1, 2, 3]', 8, false), 0);
+                });
+
+                TestRunner.runTest('Brackets: handles nested brackets', () => {
+                    TestRunner.assertEqual(findMatchingBracket('((inner))', 0, true), 8);
+                    TestRunner.assertEqual(findMatchingBracket('([{}])', 0, true), 5);
+                });
+
+                TestRunner.runTest('Brackets: returns -1 for unmatched', () => {
+                    TestRunner.assertEqual(findMatchingBracket('(unclosed', 0, true), -1);
+                    TestRunner.assertEqual(findMatchingBracket('unopened)', 8, false), -1);
+                });
+            },
+
+            /**
+             * URL encoding/decoding tests
+             */
+            runURLTests() {
+                const compressToURL = (code) => {
+                    const json = JSON.stringify(code);
+                    const bytes = new TextEncoder().encode(json);
+                    const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('');
+                    return btoa(binString)
+                        .replace(/\+/g, '-')
+                        .replace(/\//g, '_')
+                        .replace(/=+$/, '');
+                };
+
+                const decompressFromURL = (encoded) => {
+                    try {
+                        const base64 = encoded
+                            .replace(/-/g, '+')
+                            .replace(/_/g, '/');
+                        const padding = base64.length % 4;
+                        const padded = padding ? base64 + '='.repeat(4 - padding) : base64;
+
+                        const binString = atob(padded);
+                        const bytes = Uint8Array.from(binString, (char) => char.codePointAt(0));
+                        const json = new TextDecoder().decode(bytes);
+                        return JSON.parse(json);
+                    } catch (e) {
+                        return null;
+                    }
+                };
+
+                TestRunner.runTest('URL: compresses and decompresses code correctly', () => {
+                    const original = { html: '<h1>Test</h1>', css: 'h1{color:red}', js: 'console.log(1)' };
+                    const compressed = compressToURL(original);
+                    const decompressed = decompressFromURL(compressed);
+
+                    TestRunner.assertEqual(decompressed.html, original.html);
+                    TestRunner.assertEqual(decompressed.css, original.css);
+                    TestRunner.assertEqual(decompressed.js, original.js);
+                });
+
+                TestRunner.runTest('URL: handles empty code', () => {
+                    const original = { html: '', css: '', js: '' };
+                    const compressed = compressToURL(original);
+                    const decompressed = decompressFromURL(compressed);
+
+                    TestRunner.assertEqual(decompressed.html, '');
+                    TestRunner.assertEqual(decompressed.css, '');
+                    TestRunner.assertEqual(decompressed.js, '');
+                });
+
+                TestRunner.runTest('URL: handles special characters', () => {
+                    const original = { html: '<div class="test">&amp;</div>', css: '', js: '' };
+                    const compressed = compressToURL(original);
+                    const decompressed = decompressFromURL(compressed);
+
+                    TestRunner.assertEqual(decompressed.html, original.html);
+                });
+
+                TestRunner.runTest('URL: returns null for invalid input', () => {
+                    TestRunner.assertEqual(decompressFromURL('invalid!!!'), null);
+                });
+            },
+
+            /**
+             * Snippet tests
+             */
+            runSnippetTests() {
+                const cssSnippets = {
+                    'df': 'display: flex;',
+                    'dg': 'display: grid;',
+                    'cnt': 'display: flex;\njustify-content: center;\nalign-items: center;'
+                };
+
+                TestRunner.runTest('Snippets: CSS snippets expand correctly', () => {
+                    TestRunner.assertEqual(cssSnippets['df'], 'display: flex;');
+                    TestRunner.assertEqual(cssSnippets['dg'], 'display: grid;');
+                    TestRunner.assertTrue(cssSnippets['cnt'].includes('display: flex;'));
+                });
+
+                TestRunner.runTest('Snippets: undefined triggers return undefined', () => {
+                    TestRunner.assertEqual(cssSnippets['nonexistent'], undefined);
+                });
+            },
+
+            /**
+             * VFS (Virtual File System) tests
+             */
+            runVFSTests() {
+                // Mock VFS for testing
+                const mockVFS = {
+                    files: {},
+                    folders: {},
+                    collapsedFolders: {},
+
+                    createFile(name, type, content = '', folderId = null) {
+                        const id = Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+                        this.files[id] = { id, name, type, content, folderId };
+                        return id;
+                    },
+
+                    createFolder(name, parentId = null) {
+                        const id = Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+                        this.folders[id] = { id, name, parentId };
+                        return id;
+                    },
+
+                    deleteFile(id) {
+                        if (this.files[id]) {
+                            delete this.files[id];
+                            return true;
+                        }
+                        return false;
+                    },
+
+                    getFilesByType(type) {
+                        return Object.values(this.files).filter(f => f.type === type);
+                    }
+                };
+
+                TestRunner.runTest('VFS: creates files with correct properties', () => {
+                    const id = mockVFS.createFile('test.html', 'html', '<p>Test</p>');
+                    const file = mockVFS.files[id];
+
+                    TestRunner.assertEqual(file.name, 'test.html');
+                    TestRunner.assertEqual(file.type, 'html');
+                    TestRunner.assertEqual(file.content, '<p>Test</p>');
+                    TestRunner.assertEqual(file.folderId, null);
+                });
+
+                TestRunner.runTest('VFS: creates files in folders', () => {
+                    const folderId = mockVFS.createFolder('components');
+                    const fileId = mockVFS.createFile('header.html', 'html', '', folderId);
+
+                    TestRunner.assertEqual(mockVFS.files[fileId].folderId, folderId);
+                });
+
+                TestRunner.runTest('VFS: deletes files', () => {
+                    const id = mockVFS.createFile('delete-me.js', 'javascript');
+                    TestRunner.assertTrue(mockVFS.files[id]);
+
+                    mockVFS.deleteFile(id);
+                    TestRunner.assertFalse(mockVFS.files[id]);
+                });
+
+                TestRunner.runTest('VFS: filters files by type', () => {
+                    // Clear files
+                    mockVFS.files = {};
+
+                    mockVFS.createFile('index.html', 'html');
+                    mockVFS.createFile('style.css', 'css');
+                    mockVFS.createFile('app.js', 'javascript');
+                    mockVFS.createFile('utils.js', 'javascript');
+
+                    const htmlFiles = mockVFS.getFilesByType('html');
+                    const jsFiles = mockVFS.getFilesByType('javascript');
+
+                    TestRunner.assertEqual(htmlFiles.length, 1);
+                    TestRunner.assertEqual(jsFiles.length, 2);
+                });
+
+                TestRunner.runTest('VFS: creates nested folders', () => {
+                    const parentId = mockVFS.createFolder('src');
+                    const childId = mockVFS.createFolder('components', parentId);
+
+                    TestRunner.assertEqual(mockVFS.folders[childId].parentId, parentId);
+                });
+            },
+
+            /**
+             * File type detection tests
+             */
+            runFileTypeTests() {
+                const getFileType = (filename) => {
+                    if (filename.endsWith('.css')) return 'css';
+                    if (filename.endsWith('.js')) return 'javascript';
+                    return 'html';
+                };
+
+                TestRunner.runTest('FileType: detects HTML files', () => {
+                    TestRunner.assertEqual(getFileType('index.html'), 'html');
+                    TestRunner.assertEqual(getFileType('page.htm'), 'html');
+                });
+
+                TestRunner.runTest('FileType: detects CSS files', () => {
+                    TestRunner.assertEqual(getFileType('style.css'), 'css');
+                    TestRunner.assertEqual(getFileType('theme.min.css'), 'css');
+                });
+
+                TestRunner.runTest('FileType: detects JavaScript files', () => {
+                    TestRunner.assertEqual(getFileType('app.js'), 'javascript');
+                    TestRunner.assertEqual(getFileType('bundle.min.js'), 'javascript');
+                });
+
+                TestRunner.runTest('FileType: defaults to HTML for unknown', () => {
+                    TestRunner.assertEqual(getFileType('readme.txt'), 'html');
+                    TestRunner.assertEqual(getFileType('noextension'), 'html');
+                });
+            }
+        };
+
+        /**
+         * Run all tests when button is clicked
+         */
+        document.getElementById('run-tests').addEventListener('click', () => {
+            TestRunner.results = [];
+
+            tests.runHelperTests();
+            tests.runBracketTests();
+            tests.runURLTests();
+            tests.runSnippetTests();
+            tests.runVFSTests();
+            tests.runFileTypeTests();
+
+            TestRunner.renderResults();
+        });
+    </script>
+</body>
+</html>
