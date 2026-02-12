@@ -2102,9 +2102,10 @@ $('#toggler').on('click', function(){
             if (!htmlContent.trim()) {
                 output.srcdoc = '';
                 if (this.popoutWindow && !this.popoutWindow.closed) {
-                    this.popoutWindow.document.open();
-                    this.popoutWindow.document.write('');
-                    this.popoutWindow.document.close();
+                    const popoutIframe = this.popoutWindow.document.getElementById('sandboxed-output');
+                    if (popoutIframe) {
+                        popoutIframe.srcdoc = '';
+                    }
                 }
                 return;
             }
@@ -2123,9 +2124,10 @@ $('#toggler').on('click', function(){
             `;
 
             if (this.popoutWindow && !this.popoutWindow.closed) {
-                this.popoutWindow.document.open();
-                this.popoutWindow.document.write(completeHTML);
-                this.popoutWindow.document.close();
+                const popoutIframe = this.popoutWindow.document.getElementById('sandboxed-output');
+                if (popoutIframe) {
+                    popoutIframe.srcdoc = completeHTML;
+                }
             }
 
             output.srcdoc = completeHTML;
@@ -2457,6 +2459,13 @@ $('#toggler').on('click', function(){
                     this.popoutWindow = window.open('', 'CodeDivs Output', 'width=800,height=600,menubar=no,toolbar=no,location=no');
 
                     if (this.popoutWindow) {
+                        // Write a sandboxed iframe into the pop-out window
+                        this.popoutWindow.document.open();
+                        this.popoutWindow.document.write(`<!DOCTYPE html>
+                            <html><head><style>html,body{margin:0;height:100%;overflow:hidden;}iframe{width:100%;height:100%;border:none;}</style></head>
+                            <body><iframe id="sandboxed-output" sandbox="allow-scripts allow-modals allow-forms"></iframe></body></html>`);
+                        this.popoutWindow.document.close();
+
                         // Hide main output panel
                         document.getElementById('output-container').style.display = 'none';
 
